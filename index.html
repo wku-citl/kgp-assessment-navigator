@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essential Skills Assessment Navigator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1A3E56;
+            --navy-deep: #0f2938;
+            --plum: #63395F;
+            --coral: #DC6045;
+            --coral-dark: #c74d33;
+            --crimson: #A92835;
+            --cream: #fefbf5;
+            --cream-warm: #fef9f0;
+            --lavender: #d4c5d0;
+            --lavender-light: #ebe4e9;
+            --text-dark: #2a2a2a;
+            --text-mid: #444;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 8px 24px rgba(26,62,86,0.12);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.35);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--navy);
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(99,57,95,0.4) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(220,96,69,0.15) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 24px 16px;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: var(--cream);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--plum) 100%);
+            color: var(--cream);
+            padding: 44px 36px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--coral), var(--crimson), var(--coral));
+        }
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 5px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .header h1 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+        .header p {
+            font-size: 15px;
+            opacity: 0.9;
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.65;
+        }
+        .content { padding: 36px 32px 40px; }
+
+        /* Progress */
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        .progress-step {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--lavender);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 15px;
+            color: var(--plum);
+            transition: all 0.4s ease;
+        }
+        .progress-step.active {
+            background: var(--coral);
+            color: var(--cream);
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(220,96,69,0.4);
+        }
+        .progress-step.completed { background: var(--navy); color: var(--cream); }
+        .progress-label {
+            font-size: 10px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-light); text-align: center; margin-top: 4px;
+        }
+        .progress-step-wrap { display: flex; flex-direction: column; align-items: center; }
+        .progress-connector {
+            width: 40px; height: 3px;
+            background: var(--lavender);
+            border-radius: 2px;
+            transition: all 0.4s ease;
+            margin-bottom: 18px;
+        }
+        .progress-connector.completed { background: var(--navy); }
+
+        /* Screens */
+        .screen { display: none; animation: fadeIn 0.45s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Welcome */
+        .welcome-text {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 28px;
+        }
+        .welcome-text p {
+            font-size: 16px;
+            color: var(--text-mid);
+            line-height: 1.75;
+            margin-bottom: 16px;
+        }
+        .welcome-text a { color: var(--navy); font-weight: 600; text-decoration: underline; }
+        .welcome-text a:hover { color: var(--coral); }
+
+        /* Info box */
+        .info-box {
+            background: var(--cream-warm);
+            border-left: 4px solid var(--coral);
+            padding: 20px 24px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin-bottom: 28px;
+        }
+        .info-box h3 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--navy);
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+        .info-box p {
+            color: var(--text-mid);
+            font-size: 14.5px;
+            line-height: 1.65;
+        }
+
+        /* Skill Cards */
+        .skill-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-auto-rows: 1fr;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .skill-card {
+            background: var(--white);
+            border: 2px solid var(--lavender);
+            border-radius: var(--radius-md);
+            padding: 18px 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .skill-card:hover {
+            border-color: var(--navy);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .skill-card.selected {
+            background: linear-gradient(135deg, var(--navy), var(--plum));
+            color: var(--cream);
+            border-color: var(--navy);
+            box-shadow: 0 8px 20px rgba(26,62,86,0.25);
+        }
+        .skill-card.selected .skill-num { background: rgba(255,255,255,0.2); color: var(--cream); }
+        .skill-card.selected .skill-desc { color: rgba(254,251,245,0.85); }
+        .skill-num {
+            flex-shrink: 0;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--lavender-light);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            color: var(--plum);
+        }
+        .skill-info { flex: 1; }
+        .skill-info h4 { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; line-height: 1.3; }
+        .skill-desc { font-size: 12.5px; color: var(--text-light); line-height: 1.45; }
+
+        /* Mastery Cards */
+        .mastery-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .mastery-card {
+            background: var(--white);
+            border: 3px solid var(--lavender);
+            border-radius: var(--radius-md);
+            padding: 24px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+        }
+        .mastery-card:hover {
+            border-color: var(--coral);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        .mastery-card.selected {
+            background: linear-gradient(135deg, var(--coral), var(--crimson));
+            color: var(--cream);
+            border-color: var(--coral);
+            box-shadow: 0 8px 20px rgba(220,96,69,0.3);
+        }
+        .mastery-card.selected .mastery-desc { color: rgba(254,251,245,0.9); }
+        .mastery-letter {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .mastery-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+        .mastery-desc {
+            font-size: 13.5px;
+            line-height: 1.55;
+            color: var(--text-mid);
+        }
+
+        /* Blooms Cards */
+        .blooms-grid { display: grid; gap: 14px; margin-bottom: 24px; }
+        .blooms-card {
+            background: var(--white);
+            border: 2px solid var(--lavender);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+        }
+        .blooms-card:hover { border-color: var(--navy); box-shadow: var(--shadow-md); }
+        .blooms-card.selected {
+            background: linear-gradient(135deg, var(--navy), var(--plum));
+            color: var(--cream);
+            border-color: var(--navy);
+        }
+        .blooms-card.selected .blooms-tag { background: rgba(255,255,255,0.15); color: var(--cream); }
+        .blooms-card.selected .blooms-desc { color: rgba(254,251,245,0.88); }
+        .blooms-card.selected .blooms-verbs { color: rgba(254,251,245,0.75); border-color: rgba(254,251,245,0.2); }
+        .blooms-card.recommended { border-color: var(--coral); box-shadow: inset 0 0 0 1px rgba(220,96,69,0.15); }
+        .blooms-card.recommended::after {
+            content: '✦ Typical for this level';
+            position: absolute; top: -10px; right: 16px;
+            background: var(--coral); color: var(--cream);
+            font-size: 10px; font-weight: 600;
+            padding: 2px 10px; border-radius: 8px; letter-spacing: 0.3px;
+        }
+        .blooms-icon {
+            flex-shrink: 0; width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            background: var(--lavender-light);
+            display: flex; align-items: center; justify-content: center; font-size: 22px;
+        }
+        .blooms-card.selected .blooms-icon { background: rgba(255,255,255,0.15); }
+        .blooms-content { flex: 1; }
+        .blooms-content h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .blooms-tag {
+            display: inline-block; background: var(--lavender-light);
+            border-radius: 10px; padding: 2px 10px;
+            font-size: 11px; font-weight: 600; color: var(--plum); margin-bottom: 6px;
+        }
+        .blooms-desc { font-size: 13.5px; color: var(--text-mid); line-height: 1.55; margin-bottom: 6px; }
+        .blooms-verbs {
+            font-size: 12px; color: var(--text-light);
+            border-top: 1px solid var(--lavender);
+            padding-top: 6px; font-style: italic;
+        }
+        .alignment-hint {
+            background: var(--cream-warm); border-radius: var(--radius-md);
+            padding: 16px 20px; margin-bottom: 20px;
+            font-size: 13.5px; color: var(--text-mid); line-height: 1.6;
+        }
+        .alignment-hint strong { color: var(--navy); }
+
+        /* Results */
+        .selection-summary {
+            background: var(--white); border-radius: var(--radius-md);
+            padding: 22px 24px; margin-bottom: 22px; border: 2px solid var(--lavender);
+        }
+        .selection-summary h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--navy); font-size: 18px; margin-bottom: 14px;
+        }
+        .summary-row {
+            display: flex; align-items: baseline; gap: 10px;
+            margin-bottom: 8px; font-size: 14.5px;
+        }
+        .summary-label { font-weight: 700; color: var(--plum); min-width: 110px; flex-shrink: 0; }
+        .summary-value { color: var(--text-dark); }
+
+        .rubric-context {
+            background: var(--cream-warm);
+            border-radius: var(--radius-md);
+            padding: 20px 24px;
+            margin-bottom: 22px;
+            border: 1px solid var(--lavender);
+        }
+        .rubric-context h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--navy); font-size: 16px; margin-bottom: 10px;
+        }
+        .rubric-context p {
+            font-size: 13.5px; color: var(--text-mid); line-height: 1.65; margin-bottom: 6px;
+        }
+        .rubric-context ul {
+            margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-mid); line-height: 1.65;
+        }
+        .rubric-context li { margin-bottom: 4px; }
+
+        .alignment-check {
+            background: linear-gradient(135deg, var(--navy), var(--plum));
+            color: var(--cream); border-radius: var(--radius-md);
+            padding: 24px; margin-bottom: 24px;
+        }
+        .alignment-check h4 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 18px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .alignment-check p { font-size: 14px; line-height: 1.7; opacity: 0.92; }
+
+        .solutions-section {
+            background: var(--white); border-radius: var(--radius-lg);
+            padding: 32px; margin-bottom: 24px; border: 2px solid var(--lavender);
+        }
+        .solutions-section > h3 {
+            font-family: 'Source Serif 4', Georgia, serif;
+            color: var(--navy); font-size: 24px; margin-bottom: 8px; text-align: center;
+        }
+        .solutions-subtitle {
+            text-align: center; font-size: 14px; color: var(--text-light); margin-bottom: 24px;
+        }
+        .solution-item {
+            background: var(--cream); border-left: 4px solid var(--coral);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            padding: 22px 24px; margin-bottom: 16px; transition: all 0.25s ease;
+        }
+        .solution-item:hover { transform: translateX(4px); box-shadow: var(--shadow-sm); }
+        .solution-item h4 { color: var(--navy); font-size: 17px; margin-bottom: 8px; font-weight: 700; }
+        .solution-item p { color: var(--text-mid); font-size: 14px; line-height: 1.65; margin-bottom: 10px; }
+        .solution-item .application-note {
+            background: var(--white); border-radius: var(--radius-sm);
+            padding: 12px 16px; margin-top: 10px;
+            font-size: 13.5px; color: var(--text-mid); line-height: 1.6;
+            border: 1px solid var(--lavender);
+        }
+        .application-note strong { color: var(--plum); }
+        .solution-item ul { margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-mid); line-height: 1.65; }
+        .solution-item li { margin-bottom: 4px; }
+
+        .watchout-section {
+            background: var(--cream-warm); border: 2px dashed var(--coral);
+            border-radius: var(--radius-md); padding: 22px 24px; margin-top: 24px;
+        }
+        .watchout-section h4 {
+            color: var(--crimson); font-size: 16px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .watchout-section p { font-size: 13.5px; line-height: 1.65; color: var(--text-mid); }
+
+        /* Buttons */
+        .button-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+        .btn {
+            padding: 13px 32px; border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; cursor: pointer;
+            transition: all 0.25s ease; font-family: 'DM Sans', sans-serif; letter-spacing: 0.2px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg, var(--navy), var(--plum)); color: var(--cream); }
+        .btn-primary:disabled { background: var(--lavender); color: #999; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-secondary { background: var(--white); color: var(--navy); border: 2px solid var(--navy); }
+        .btn-secondary:hover { background: var(--navy); color: var(--cream); }
+        .btn-restart { background: linear-gradient(135deg, var(--coral), var(--crimson)); color: var(--cream); }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+            overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+        @media (max-width: 767px) {
+            .header h1 { font-size: 24px; }
+            .header { padding: 32px 20px; }
+            .content { padding: 28px 18px; }
+            .skill-grid { grid-template-columns: 1fr; }
+            .mastery-grid { grid-template-columns: 1fr; }
+            .progress-label { font-size: 9px; }
+            .progress-connector { width: 24px; }
+            .solutions-section { padding: 22px 18px; }
+            .summary-row { flex-direction: column; gap: 2px; }
+            .summary-label { min-width: unset; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="header-badge">Kentucky Graduate Profile</div>
+        <h1>Essential Skills Assessment Navigator</h1>
+        <p>A guided tool to help you identify meaningful, well-aligned assessments for the essential skills addressed in your courses</p>
+    </div>
+    <div class="content">
+        <div class="progress-indicator">
+            <div class="progress-step-wrap"><div class="progress-step active" id="step1">1</div><div class="progress-label">Skill</div></div>
+            <div class="progress-connector" id="conn1"></div>
+            <div class="progress-step-wrap"><div class="progress-step" id="step2">2</div><div class="progress-label">Level</div></div>
+            <div class="progress-connector" id="conn2"></div>
+            <div class="progress-step-wrap"><div class="progress-step" id="step3">3</div><div class="progress-label">Outcomes</div></div>
+            <div class="progress-connector" id="conn3"></div>
+            <div class="progress-step-wrap"><div class="progress-step" id="step4">4</div><div class="progress-label">Assess</div></div>
+        </div>
+
+        <!-- WELCOME -->
+        <div class="screen active" id="welcome-screen">
+            <div class="welcome-text">
+                <p>As Kentucky's postsecondary institutions work to integrate the <a href="https://cpe.ky.gov/ourwork/kygradprofile.html" target="_blank" rel="noopener noreferrer">10 Essential Skills</a> into every academic program, one of the most important questions faculty face is: <strong>How do I meaningfully assess these skills in my course?</strong></p>
+                <p>This tool walks you through a short reflective process to help you identify assessment approaches that align with the essential skill you're addressing, the level at which your course addresses it, and what your learning outcomes ask students to do. The goal is not to prescribe a single right answer, but to offer practical options you can adapt for your discipline and your students.</p>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToScreen('skill-screen')">Get Started</button>
+            </div>
+        </div>
+
+        <!-- STEP 1: SKILL -->
+        <div class="screen" id="skill-screen">
+            <div class="info-box">
+                <h3>Step 1: Select an Essential Skill</h3>
+                <p>Choose the Essential Skill you'd like to explore assessment options for. If your course addresses multiple skills, you can return to explore additional skills after completing the process.</p>
+            </div>
+            <div class="skill-grid" id="skill-grid"></div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToScreen('welcome-screen')">Back</button>
+                <button class="btn btn-primary" id="skill-next" disabled onclick="goToScreen('mastery-screen')">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: MASTERY -->
+        <div class="screen" id="mastery-screen">
+            <div class="info-box">
+                <h3>Step 2: How Does Your Course Address This Skill?</h3>
+                <p>Based on your program's curriculum map, select the level at which your course addresses <strong id="mastery-skill-name"></strong>. If you're unsure, think about where your course falls in the student's overall progression through the program.</p>
+            </div>
+            <div class="mastery-grid" id="mastery-grid">
+                <div class="mastery-card" data-mastery="I" onclick="selectMastery('I')">
+                    <div class="mastery-letter">I</div>
+                    <h4>Introduced</h4>
+                    <p class="mastery-desc">Students encounter this skill in an academic context, often for the first time at the postsecondary level. The focus is on building awareness and foundational understanding with support and scaffolding.</p>
+                </div>
+                <div class="mastery-card" data-mastery="R" onclick="selectMastery('R')">
+                    <div class="mastery-letter">R</div>
+                    <h4>Reinforced</h4>
+                    <p class="mastery-desc">Students are practicing and deepening this skill with increasing independence. The focus is on applying the skill in varied contexts and building toward competence.</p>
+                </div>
+                <div class="mastery-card" data-mastery="M" onclick="selectMastery('M')">
+                    <div class="mastery-letter">M</div>
+                    <h4>Mastered</h4>
+                    <p class="mastery-desc">Students demonstrate this skill with expertise and precision. The focus is on independent, sophisticated application in complex, authentic, or professional contexts.</p>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToScreen('skill-screen')">Back</button>
+                <button class="btn btn-primary" id="mastery-next" disabled onclick="goToScreen('blooms-screen')">Continue</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: BLOOMS -->
+        <div class="screen" id="blooms-screen">
+            <div class="info-box">
+                <h3>Step 3: What Are Students Expected to Demonstrate?</h3>
+                <p>Think about the learning outcomes in your course related to <strong id="blooms-skill-name"></strong>. Which description below best captures what students are expected to <em>do</em>? Select the one that feels like the closest match — there is no wrong answer here.</p>
+            </div>
+            <div class="alignment-hint" id="alignment-hint"></div>
+            <div class="blooms-grid" id="blooms-grid"></div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToScreen('mastery-screen')">Back</button>
+                <button class="btn btn-primary" id="blooms-next" disabled onclick="showResults()">See Assessment Options</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: RESULTS -->
+        <div class="screen" id="results-screen">
+            <div class="selection-summary">
+                <h4>Your Selections</h4>
+                <div class="summary-row"><span class="summary-label">Essential Skill:</span><span class="summary-value" id="result-skill"></span></div>
+                <div class="summary-row"><span class="summary-label">Course Level:</span><span class="summary-value" id="result-mastery"></span></div>
+                <div class="summary-row"><span class="summary-label">Student Focus:</span><span class="summary-value" id="result-blooms"></span></div>
+            </div>
+            <div class="rubric-context" id="rubric-context"></div>
+            <div class="alignment-check" id="alignment-check"></div>
+            <div class="solutions-section">
+                <h3>Recommended Assessment Approaches</h3>
+                <p class="solutions-subtitle">These suggestions are designed to be adapted to any discipline. Consider which approaches best fit your course content and student needs.</p>
+                <div id="solutions-container"></div>
+                <div class="watchout-section" id="watchout-section"></div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="goToScreen('blooms-screen')">Back</button>
+                <button class="btn btn-restart" onclick="restartTool()">Explore Another Skill</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// SKILLS DATA
+// ============================================================
+const skills = [
+    { id:"es1", num:1, name:"Communicate Effectively", desc:"Listening, writing, speaking, and presenting professionally", context:"effective communication" },
+    { id:"es2", num:2, name:"Think Critically and Creatively", desc:"Evaluating assumptions, solving problems, generating ideas", context:"critical and creative thinking" },
+    { id:"es3", num:3, name:"Apply Quantitative Reasoning", desc:"Using data and methods to reach informed conclusions", context:"quantitative reasoning" },
+    { id:"es4", num:4, name:"Interact Effectively with Others", desc:"Understanding different perspectives, building self-awareness, collaborating respectfully", context:"interpersonal skills" },
+    { id:"es5", num:5, name:"Adapt and Lead Through Change", desc:"Navigating change, motivating and coaching others", context:"adaptability and leadership" },
+    { id:"es6", num:6, name:"Perform Professionally", desc:"Practicing ethics, managing time, taking initiative, demonstrating accountability", context:"professional performance" },
+    { id:"es7", num:7, name:"Engage in Civic Life", desc:"Participating in political, social, and other activities that benefit society", context:"civic engagement" },
+    { id:"es8", num:8, name:"Collaborate and Work in Teams", desc:"Working with others, managing conflict, sharing responsibility", context:"teamwork and collaboration" },
+    { id:"es9", num:9, name:"Apply Knowledge to Career", desc:"Connecting academic theory to professional practice", context:"knowledge application" },
+    { id:"es10", num:10, name:"Use Information for Decision Making", desc:"Identifying, evaluating, and responsibly using information", context:"information literacy" }
+];
+
+// ============================================================
+// CPE RUBRIC PERFORMANCE INDICATORS
+// I & R both map to Milestone; M maps to Capstone
+// ============================================================
+const rubricIndicators = {
+    es1: {
+        milestone: [
+            "Gives focused attention to others, asks clarifying questions, and shows awareness of nonverbal signals",
+            "Writes formally and informally using logical structure, complete sentences, standard grammar, and correct punctuation",
+            "Engages in formal conversations with peers and professionals by offering information and ideas"
+        ],
+        capstone: [
+            "Facilitates conversation by using active listening techniques and nonverbal signals",
+            "Tailors written communication to the audience and situation, using professional vocabulary, tone, and logically organized structure suited to the context and purpose",
+            "Prepares, structures, and delivers an oral presentation in a professional setting"
+        ]
+    },
+    es2: {
+        milestone: [
+            "Identifies aspects of a problem clearly by locating and using relevant sources of information",
+            "Seeks out and considers different perspectives on a problem",
+            "Articulates patterns, relationships, context, and other factors relevant to a problem",
+            "Links concepts to generate novel ideas or solutions to problems"
+        ],
+        capstone: [
+            "Analyzes a problem and its components accurately using credible sources, data, and information",
+            "Evaluates alternative perspectives, allowing new information to add depth to thinking about a problem",
+            "Evaluates reasonable implications and weighs and synthesizes significant evidence and relevant perspectives to draw informed and innovative conclusions",
+            "Integrates varied perspectives to propose an innovative idea or solution"
+        ]
+    },
+    es3: {
+        milestone: [
+            "Illustrates contextual data using a variety of models, including equations, graphs, and tables",
+            "Applies percentages and statistics to describe contextual data",
+            "Utilizes a variety of quantitative strategies to articulate assumptions and solve problems"
+        ],
+        capstone: [
+            "Analyzes real-world data (e.g., case studies, simulations, experiments) using appropriate quantitative and qualitative strategies",
+            "Differentiates between appropriate and inappropriate uses of statistics within real-world contexts",
+            "Applies quantitative reasoning to real-world scenarios to reach well-reasoned and data-informed conclusions"
+        ]
+    },
+    es4: {
+        milestone: [
+            "Identifies how one's own perspectives and lived experiences impact relationships",
+            "Identifies positive ways to interact with people",
+            "Identifies multiple perspectives, ideas, and beliefs through interactions"
+        ],
+        capstone: [
+            "Articulates insights into one's own perspectives and lived experiences that create openness to positive interactions with others",
+            "Creates positive interactions with people",
+            "Engages effectively with individuals by applying insights about one's own perspectives and beliefs to relate to others and bridge differences"
+        ]
+    },
+    es5: {
+        milestone: [
+            "Contributes toward achieving a common goal",
+            "Adjusts to new situations by doing things differently and showing a positive mindset",
+            "Encourages others to persist in achieving goals through changing situations"
+        ],
+        capstone: [
+            "Overcomes barriers or obstacles to achieving a common goal, often by providing guidance and support to others",
+            "Responds to and anticipates change by practicing and modeling new strategies and tools to thrive in a dynamic environment",
+            "Coaches others through changing situations"
+        ]
+    },
+    es6: {
+        milestone: [
+            "Describes what constitutes ethical behavior and makes choices accordingly",
+            "Applies organizational and time management skills to prioritize and complete assigned tasks",
+            "Takes personal accountability for actions, including mistakes",
+            "Converses with others using field-specific terminology and tools"
+        ],
+        capstone: [
+            "Models ethical behavior and adheres to a professional code of ethics, as applicable",
+            "Shows initiative by leveraging organizational and time management skills to proactively seek professional opportunities for growth",
+            "Uses feedback from others to improve performance",
+            "Stays current with industry standards, including best practices and technological tools within the chosen profession"
+        ]
+    },
+    es7: {
+        milestone: [
+            "Engages with others who represent different perspectives on public policy and the social good through active listening, dialogue, and collaboration",
+            "Leverages knowledge of the impact of civic participation on public policy to plan for social action",
+            "Presents persuasive arguments that benefit society based on reflection, analysis, and outside knowledge or perspectives"
+        ],
+        capstone: [
+            "Assesses fact-based dimensions of community-based problems to generate solutions reflecting multiple needs and perspectives",
+            "Collaborates to engage community stakeholders in civic action that targets appropriate levers for civic change",
+            "Tailors communications to elicit support for civic action in response to the needs, interests, and potential contributions of different audiences"
+        ]
+    },
+    es8: {
+        milestone: [
+            "Contributes ideas aligned to identified objectives of the team",
+            "Addresses conflicts constructively, communicating expectations and adjusting own behavior based on feedback",
+            "Identifies tasks required to reach a goal and learns about team members' assets to support the distribution of roles and responsibilities",
+            "Adapts to changing project requirements and roles in a way that fosters mutual trust and respect"
+        ],
+        capstone: [
+            "Advocates for evidence-based solutions that promote the team's identified objectives",
+            "Fosters strong team cohesion by giving and soliciting feedback and responding transparently",
+            "Collaborates with multiple teams, utilizing different perspectives and skills to achieve common goals",
+            "Navigates between leading and supporting through advocacy for mutual goals and integration of team members' strengths"
+        ]
+    },
+    es9: {
+        milestone: [
+            "Applies learned knowledge to resolve foundational problems pertinent to the desired career pathway",
+            "Explains concepts that support the practical application of knowledge, skills, and abilities related to professional interests",
+            "Reflects on personal and academic experiences to assess compatibility and provide reasoning for career choice"
+        ],
+        capstone: [
+            "Analyzes and solves complex, real-world problems in the field using advanced knowledge, skills, and abilities",
+            "Integrates academic learning with hands-on experience to critically assess and solve complex challenges encountered in professional environments",
+            "Articulates a career development plan that builds on prior learning and experiences to define clear goals for achievement and continued learning after graduation"
+        ]
+    },
+    es10: {
+        milestone: [
+            "Develops questions with the appropriate scope for the field",
+            "Implements search strategies to find information using credible resources relevant to the field",
+            "Analyzes strengths and weaknesses of information sources to identify elements of bias, expertise, and point of view",
+            "Identifies connections between relevant sources to make a decision"
+        ],
+        capstone: [
+            "Articulates questions informed by key concepts, relevant terminology, and related questions in the field",
+            "Executes well-developed search strategies that consider all available resources and revises the strategy as necessary",
+            "Critiques information sources to thoroughly evaluate bias, expertise, point of view, and relevance and currency to the field",
+            "Synthesizes patterns across sources, excluding irrelevant information to draw conclusions and reach informed decisions",
+            "Attributes ethically accessed information consistently using conventions appropriate to the field"
+        ]
+    }
+};
+
+function getRubricLevel(mastery) {
+    return mastery === 'M' ? 'capstone' : 'milestone';
+}
+function getRubricLevelLabel(mastery) {
+    return mastery === 'M' ? 'Capstone' : 'Milestone';
+}
+
+// ============================================================
+// MASTERY INFO
+// ============================================================
+const masteryInfo = {
+    I: { label:"Introduced", full:"Introduced" },
+    R: { label:"Reinforced", full:"Reinforced / Developed" },
+    M: { label:"Mastered", full:"Mastered" }
+};
+
+// ============================================================
+// BLOOM'S LEVELS
+// ============================================================
+const bloomsLevels = [
+    { id:"remember", icon:"📖", title:"Recall & Explain", tag:"Remember / Understand",
+      desc:"Students identify, define, describe, or explain key concepts, terms, and principles. They can summarize ideas and demonstrate foundational knowledge.",
+      verbs:"Common outcome verbs: define, describe, explain, identify, list, summarize, paraphrase, recognize",
+      typicalFor:["I"] },
+    { id:"apply", icon:"🔧", title:"Apply & Implement", tag:"Apply",
+      desc:"Students use what they've learned to carry out procedures, solve problems, or complete tasks. They can transfer knowledge to familiar or moderately new situations.",
+      verbs:"Common outcome verbs: apply, demonstrate, implement, solve, use, illustrate, calculate, practice",
+      typicalFor:["I","R"] },
+    { id:"analyze", icon:"🔬", title:"Analyze & Examine", tag:"Analyze",
+      desc:"Students break down complex information, identify patterns and relationships, compare perspectives, and examine underlying assumptions or structures.",
+      verbs:"Common outcome verbs: analyze, compare, contrast, differentiate, examine, organize, deconstruct, investigate",
+      typicalFor:["R"] },
+    { id:"evaluate", icon:"⚖️", title:"Evaluate & Justify", tag:"Evaluate",
+      desc:"Students make informed judgments about quality, credibility, or effectiveness. They assess approaches, critique ideas, and defend conclusions with evidence.",
+      verbs:"Common outcome verbs: assess, critique, defend, evaluate, judge, justify, prioritize, recommend",
+      typicalFor:["R","M"] },
+    { id:"create", icon:"✨", title:"Create & Design", tag:"Create",
+      desc:"Students produce original work, develop new solutions, construct arguments, or design approaches. They synthesize knowledge into something that didn't exist before.",
+      verbs:"Common outcome verbs: compose, construct, create, design, develop, formulate, generate, produce, propose",
+      typicalFor:["M"] }
+];
+
+// Alignment hints
+const alignmentHints = {
+    I: "Courses that <strong>introduce</strong> a skill typically have outcomes at the <em>Recall & Explain</em> or <em>Apply & Implement</em> level. Students are building foundational understanding, so it's natural for outcomes to focus on recognizing, explaining, or practicing the skill in structured contexts.",
+    R: "Courses that <strong>reinforce</strong> a skill typically have outcomes at the <em>Apply & Implement</em>, <em>Analyze & Examine</em>, or <em>Evaluate & Justify</em> level. Students should be moving beyond basic recall and beginning to use the skill more independently and in varied contexts.",
+    M: "Courses where students are expected to <strong>master</strong> a skill typically have outcomes at the <em>Evaluate & Justify</em> or <em>Create & Design</em> level. At this stage, students should be demonstrating the skill with sophistication, often in authentic or professional scenarios."
+};
+
+// ============================================================
+// ASSESSMENT DATA — now with mastery-aware application notes
+// ============================================================
+const assessments = {
+    remember: [
+        { title:"Knowledge Checks & Quizzes",
+          desc:"Short-form assessments that verify students can recall and explain foundational concepts.",
+          details:"These work well early in a unit or module to confirm students have the base knowledge needed for more complex work. Consider low-stakes or practice formats that reduce test anxiety and encourage active study.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'M'
+                  ? `At the mastered level, the rubric expects students to do more than recall — for example, "${ind[0].toLowerCase()}." If your assessments focus primarily on recall, consider whether they capture the depth this level requires.`
+                  : `At this level, the rubric expects students to build toward competencies like "${ind[0].toLowerCase()}." Knowledge checks can confirm students have the foundational understanding to get there.`;
+          }
+        },
+        { title:"Concept Mapping",
+          desc:"Students visually organize and connect key ideas, showing how concepts relate to one another.",
+          details:"Concept maps reveal how students are organizing their understanding and can surface misconceptions early. They're especially useful for skills that involve interconnected ideas or processes.",
+          appFn:(sk,m) => `Ask students to create a concept map showing how the key components of ${sk.context} connect to one another and to their course content. This helps build the foundation for more complex work with this skill.`
+        },
+        { title:"Guided Reflection or Summary Writing",
+          desc:"Students articulate their understanding of key ideas in their own words through structured prompts.",
+          details:"Reflective writing helps students consolidate learning and gives you insight into their comprehension. Keep prompts focused and provide clear expectations for length and depth.",
+          appFn:(sk,m) => `Ask students to summarize the key principles of ${sk.context} and explain why these principles matter in their field of study. This builds awareness that supports deeper engagement later.`
+        },
+        { title:"Annotation & Reading Response",
+          desc:"Students engage with course texts by highlighting, annotating, and responding to key passages or data.",
+          details:"Structured annotation builds close reading habits and ensures students are actively engaging with material. Provide annotation guidelines or specific questions to focus attention.",
+          appFn:(sk,m) => `Have students annotate a discipline-relevant reading, identifying where the author demonstrates or discusses ${sk.context}, and explain their annotations in a brief response.`
+        }
+    ],
+    apply: [
+        { title:"Guided Case Studies",
+          desc:"Students apply concepts to realistic scenarios with structured questions that guide their analysis.",
+          details:"Case studies bridge theory and practice effectively. At the 'Apply' level, provide scaffolding through guiding questions or a structured framework. Students should demonstrate they can use what they've learned, not just describe it.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'I'
+                  ? `Present a scenario where ${sk.context} must be applied and provide guiding questions. The rubric expects students at this stage to "${ind[0].toLowerCase()}" — your case study can scaffold toward this.`
+                  : `Present a scenario requiring ${sk.context}. At the reinforced level, reduce scaffolding — the rubric expects students to "${ind[0].toLowerCase()}" with increasing independence.`;
+          }
+        },
+        { title:"Problem-Based Exercises",
+          desc:"Students work through defined problems using methods and concepts from the course.",
+          details:"Effective problem sets move beyond rote application — they require students to choose an approach, apply it correctly, and interpret results. Include problems of varying difficulty.",
+          appFn:(sk,m) => `Design exercises where students must use ${sk.context} to work through problems relevant to your course. Include both straightforward applications and scenarios that require students to navigate minor complications or make choices about approach.`
+        },
+        { title:"Practice Simulations or Role Plays",
+          desc:"Students practice the skill in a low-stakes, structured environment that mimics real application.",
+          details:"Simulations give students the experience of doing rather than just knowing. They're especially powerful for skills that involve interaction, decision-making, or professional behavior. Debrief afterward to reinforce learning.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return `Create a structured activity where students practice ${sk.context} in a simulated context. The rubric's expectation that students "${ind[ind.length-1].toLowerCase()}" can be practiced in a low-stakes simulation before being assessed in higher-stakes formats.`;
+          }
+        },
+        { title:"Demonstration or Skill Performance",
+          desc:"Students show they can carry out a procedure, process, or technique correctly.",
+          details:"Demonstrations are useful for skills that have observable steps or processes. Provide clear criteria so students understand what proficient performance looks like.",
+          appFn:(sk,m) => `Ask students to demonstrate their ability to apply ${sk.context} through a specific task relevant to your discipline. Use a clear rubric or checklist so students know what proficient performance looks like at this level.`
+        }
+    ],
+    analyze: [
+        { title:"Comparative Analysis",
+          desc:"Students examine multiple perspectives, approaches, or sources and identify meaningful similarities and differences.",
+          details:"Comparative work pushes students beyond surface understanding into deeper engagement with complexity. Provide a framework or set of criteria for comparison to keep the analysis focused.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('perspective') || i.toLowerCase().includes('analyz') || i.toLowerCase().includes('differentiat')) || ind[0];
+              return `Have students compare two or more approaches to ${sk.context} within your discipline. The rubric expects students at this level to "${relevant.toLowerCase()}" — a comparative analysis is a natural way to demonstrate this.`;
+          }
+        },
+        { title:"Data or Source Interpretation",
+          desc:"Students examine data, texts, or primary sources and draw evidence-based conclusions.",
+          details:"Interpretation assignments develop analytical rigor. Provide authentic or discipline-relevant materials and ask students to go beyond description to explain what the evidence means and why it matters.",
+          appFn:(sk,m) => `Provide discipline-relevant data or source material and ask students to analyze it through the lens of ${sk.context}. Students should identify patterns, draw conclusions, and explain their reasoning — moving beyond simple description into interpretation.`
+        },
+        { title:"Structured Debate or Discussion",
+          desc:"Students examine an issue from multiple sides, supporting claims with evidence and reasoning.",
+          details:"Structured debates develop analytical thinking while also building communication skills. Assign positions (rather than letting students choose) to ensure engagement with perspectives different from their own.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('perspective') || i.toLowerCase().includes('engag')) || ind[1] || ind[0];
+              return `Organize a structured discussion around a discipline-relevant question that requires students to analyze different dimensions of ${sk.context}. This aligns with the rubric expectation that students "${relevant.toLowerCase()}."`;
+          }
+        },
+        { title:"Process or Systems Analysis",
+          desc:"Students break down a complex process, system, or situation into component parts and examine how they interact.",
+          details:"Systems thinking is a powerful analytical skill. Ask students to map out a process, identify where breakdowns occur, or trace how changes in one part affect the whole.",
+          appFn:(sk,m) => `Ask students to deconstruct a real-world example from your discipline, identifying the components related to ${sk.context} and explaining how they interact and influence outcomes.`
+        }
+    ],
+    evaluate: [
+        { title:"Critique & Peer Review",
+          desc:"Students assess the quality of work — their own, their peers', or professional examples — using defined criteria.",
+          details:"Evaluation skills develop when students practice applying standards of quality. Provide rubrics or evaluation criteria, and teach students how to give constructive, evidence-based feedback.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('evaluat') || i.toLowerCase().includes('critiqu') || i.toLowerCase().includes('assess') || i.toLowerCase().includes('feedback')) || ind[0];
+              return `Have students evaluate an example of ${sk.context} in practice — peer work, a professional example, or a case study — using criteria you provide or that they help develop. The rubric's expectation that students "${relevant.toLowerCase()}" is well-served by critique-based assessments.`;
+          }
+        },
+        { title:"Position or Argument Paper",
+          desc:"Students take a stance on a debatable issue and defend it with evidence, while acknowledging counterarguments.",
+          details:"Position papers require students to move beyond summary into judgment. Effective prompts present genuine tensions or trade-offs rather than questions with obvious answers.",
+          appFn:(sk,m) => `Assign a paper where students take and defend a position on a debatable question related to ${sk.context} in your discipline, supporting their argument with course concepts and credible evidence while engaging with counterarguments.`
+        },
+        { title:"Evaluation Rubric Development",
+          desc:"Students create or refine criteria for evaluating quality in relation to the skill being assessed.",
+          details:"When students help define what 'good' looks like, they develop deeper understanding of the skill itself. This builds metacognitive skills and helps students become more effective self-assessors.",
+          appFn:(sk,m) => `Ask students to develop evaluation criteria for assessing ${sk.context} in a professional context. What distinguishes excellent performance from adequate? What evidence would demonstrate proficiency?`
+        },
+        { title:"Evidence-Based Recommendation",
+          desc:"Students assess a situation and recommend a course of action, justifying their recommendation with evidence.",
+          details:"Recommendation-based assessments mirror professional decision-making. Students must weigh options, consider constraints, and make defensible choices — all hallmarks of evaluative thinking.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'M'
+                  ? `Present a complex, discipline-relevant scenario and ask students to evaluate the situation, weigh multiple options, and produce a justified recommendation. At the mastered level, the rubric expects students to "${ind[0].toLowerCase()}" — this assessment type maps directly to that expectation.`
+                  : `Present a discipline-relevant scenario and ask students to evaluate the situation, consider options, and recommend an approach grounded in principles of ${sk.context}.`;
+          }
+        }
+    ],
+    create: [
+        { title:"Original Project or Design",
+          desc:"Students produce an original work product that demonstrates sophisticated application of the skill in an authentic context.",
+          details:"Creative projects should have clear parameters and assessment criteria even though the final product is original. Provide enough structure to ensure rigor while leaving room for student creativity and disciplinary application.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Assign a project where students design or produce something original that demonstrates mastery of ${sk.context}. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — an original project is one of the most authentic ways to assess this.`;
+          }
+        },
+        { title:"Portfolio with Reflective Commentary",
+          desc:"Students curate a collection of their work that demonstrates growth and competence, accompanied by reflective analysis.",
+          details:"Portfolios are powerful for skills that develop over time. The reflective component is key — it's where students demonstrate they can not only perform the skill but understand their own development.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The capstone rubric expects students to "${ind[ind.length-1].toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
+          }
+        },
+        { title:"Capstone or Culminating Experience",
+          desc:"Students undertake a substantial, integrative project that requires them to synthesize learning from across the curriculum.",
+          details:"Capstone experiences should require students to independently draw on and integrate multiple skills and knowledge areas. They often include both a product and presentation component.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Design a culminating experience where students independently apply ${sk.context} at a professional level. The rubric expects graduates to "${ind[0].toLowerCase()}" — a capstone experience allows students to demonstrate this through a substantial, integrative project.`;
+          }
+        },
+        { title:"Professional Presentation or Publication",
+          desc:"Students create and deliver work in a format appropriate to professional practice in their discipline.",
+          details:"Asking students to communicate their work to an authentic audience raises the stakes and mirrors professional expectations. Consider conference-style presentations, white papers, or public-facing deliverables.",
+          appFn:(sk,m) => `Ask students to produce a professional-quality deliverable related to ${sk.context} that could serve an authentic audience — a presentation, report, proposal, or publication appropriate to your discipline.`
+        }
+    ]
+};
+
+
+// ============================================================
+// ALIGNMENT & WATCHOUT LOGIC
+// ============================================================
+function getAlignmentMessage(mastery, blooms) {
+    const level = bloomsLevels.find(b => b.id === blooms);
+    const isTypical = level.typicalFor.includes(mastery);
+
+    if (isTypical) {
+        return { icon:"✅", title:"Strong Alignment",
+            msg:`The cognitive level you selected (<em>${level.title}</em>) is well-aligned with courses that <strong>${masteryInfo[mastery].label.toLowerCase()}</strong> this skill. The assessment options below should work well with your current learning outcomes.`
+        };
+    }
+    if (mastery === 'I' && (blooms === 'evaluate' || blooms === 'create')) {
+        return { icon:"💡", title:"Something to Consider",
+            msg:`Your course <strong>introduces</strong> this skill, but the outcomes you described align with a higher cognitive level (<em>${level.title}</em>). This isn't necessarily a problem — but it's worth checking whether your learning outcomes reflect the introductory nature of the course. If your outcomes use advanced verbs like "evaluate" or "create," your course may actually be reinforcing or building toward mastery. The assessments below are tailored to your selection, but you might also explore what the <em>Reinforced</em> or <em>Mastered</em> level suggests.`
+        };
+    }
+    if (mastery === 'M' && (blooms === 'remember' || blooms === 'apply')) {
+        return { icon:"💡", title:"Something to Consider",
+            msg:`Your course expects students to <strong>master</strong> this skill, but the outcomes you described align with a foundational cognitive level (<em>${level.title}</em>). Mastery typically involves higher-order thinking like evaluation, judgment, or original creation. It may be worth reviewing whether your learning outcomes fully capture the depth of what you expect students to demonstrate. The assessments below match your selection, but you may also want to see what <em>Evaluate & Justify</em> or <em>Create & Design</em> level options look like.`
+        };
+    }
+    return { icon:"📝", title:"A Note on Alignment",
+        msg:`The cognitive level you selected (<em>${level.title}</em>) is a less typical pairing with courses at the <strong>${masteryInfo[mastery].label.toLowerCase()}</strong> level, though it can absolutely be appropriate depending on your course context. The assessments below are tailored to your selection. If you'd like to compare, consider exploring what a different cognitive level suggests for this level.`
+    };
+}
+
+function getWatchout(mastery, blooms) {
+    const tips = [];
+    if (mastery === 'M') {
+        tips.push("At the <strong>Mastered</strong> level, assessments should require students to demonstrate the skill independently, in authentic or complex contexts. If your current assessments provide significant scaffolding (step-by-step instructions, templates, fill-in-the-blank formats), they may be assessing at a lower level than intended.");
+    }
+    if (mastery === 'I') {
+        tips.push("When a skill is being <strong>introduced</strong>, students benefit from lower-stakes assessments with clear expectations and supportive feedback. If your current assessments penalize students heavily for incomplete mastery of a skill they're just encountering, consider adjusting the weight or format.");
+    }
+    if (blooms === 'evaluate' || blooms === 'create') {
+        tips.push("Higher-order assessments like critiques and original projects need <strong>clear rubrics</strong> that specify what proficient performance looks like. Without explicit criteria, both you and your students may have different expectations of what 'quality' means.");
+    }
+    if (blooms === 'remember') {
+        tips.push("If your assessments focus primarily on recall (multiple choice, matching, definitions), they may not fully capture whether students understand the concepts well enough to use them. Consider adding at least one assessment that asks students to <strong>explain</strong> or <strong>apply</strong> what they know.");
+    }
+    tips.push("Review your learning outcomes alongside your assessments. The verbs in your outcomes (describe, analyze, create, etc.) signal what students should be able to <strong>do</strong>. Your assessments should give students the opportunity to <em>demonstrate those specific actions</em>. If there's a gap, the most actionable fix is usually adjusting the assessment rather than rewriting the outcome.");
+    return tips;
+}
+
+// ============================================================
+// STATE & NAVIGATION
+// ============================================================
+const state = { screen:'welcome', skill:null, mastery:null, blooms:null };
+
+function goToScreen(id) {
+    if (id === 'mastery-screen' && state.skill) {
+        document.getElementById('mastery-skill-name').textContent = skills.find(s=>s.id===state.skill).name;
+    }
+    if (id === 'blooms-screen' && state.skill && state.mastery) {
+        document.getElementById('blooms-skill-name').textContent = skills.find(s=>s.id===state.skill).name;
+        document.getElementById('alignment-hint').innerHTML = alignmentHints[state.mastery];
+        renderBloomsCards();
+    }
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    state.screen = id.replace('-screen','');
+    updateProgress();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress() {
+    const map = {welcome:1,skill:1,mastery:2,blooms:3,results:4};
+    const cur = map[state.screen]||1;
+    for(let i=1;i<=4;i++){
+        const el=document.getElementById('step'+i);
+        const cn=document.getElementById('conn'+i);
+        el.classList.remove('active','completed');
+        if(cn) cn.classList.remove('completed');
+        if(i<cur){el.classList.add('completed');if(cn)cn.classList.add('completed');}
+        else if(i===cur) el.classList.add('active');
+    }
+}
+
+// ============================================================
+// STEP 1
+// ============================================================
+function renderSkillCards() {
+    const grid = document.getElementById('skill-grid');
+    grid.innerHTML = '';
+    skills.forEach(sk => {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+        card.dataset.skill = sk.id;
+        card.tabIndex = 0;
+        card.onclick = () => selectSkill(sk.id);
+        card.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();selectSkill(sk.id);} };
+        card.innerHTML = `<div class="skill-num">${sk.num}</div><div class="skill-info"><h4>${sk.name}</h4><p class="skill-desc">${sk.desc}</p></div>`;
+        grid.appendChild(card);
+    });
+}
+
+function selectSkill(id) {
+    document.querySelectorAll('.skill-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelector(`[data-skill="${id}"]`).classList.add('selected');
+    state.skill = id; state.mastery = null; state.blooms = null;
+    document.getElementById('skill-next').disabled = false;
+    document.querySelectorAll('.mastery-card').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('mastery-next').disabled = true;
+    document.getElementById('blooms-next').disabled = true;
+}
+
+// ============================================================
+// STEP 2
+// ============================================================
+function selectMastery(level) {
+    document.querySelectorAll('.mastery-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelector(`[data-mastery="${level}"]`).classList.add('selected');
+    state.mastery = level; state.blooms = null;
+    document.getElementById('mastery-next').disabled = false;
+    document.getElementById('blooms-next').disabled = true;
+}
+
+// ============================================================
+// STEP 3
+// ============================================================
+function renderBloomsCards() {
+    const grid = document.getElementById('blooms-grid');
+    grid.innerHTML = '';
+    bloomsLevels.forEach(level => {
+        const card = document.createElement('div');
+        card.className = 'blooms-card';
+        if(level.typicalFor.includes(state.mastery)) card.classList.add('recommended');
+        card.dataset.blooms = level.id;
+        card.tabIndex = 0;
+        card.onclick = () => selectBlooms(level.id);
+        card.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();selectBlooms(level.id);} };
+        card.innerHTML = `
+            <div class="blooms-icon">${level.icon}</div>
+            <div class="blooms-content">
+                <h4>${level.title}</h4>
+                <div class="blooms-tag">${level.tag}</div>
+                <p class="blooms-desc">${level.desc}</p>
+                <p class="blooms-verbs">${level.verbs}</p>
+            </div>`;
+        grid.appendChild(card);
+    });
+}
+
+function selectBlooms(id) {
+    document.querySelectorAll('.blooms-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelector(`[data-blooms="${id}"]`).classList.add('selected');
+    state.blooms = id;
+    document.getElementById('blooms-next').disabled = false;
+}
+
+// ============================================================
+// STEP 4: RESULTS
+// ============================================================
+function showResults() {
+    const skill = skills.find(s=>s.id===state.skill);
+    const bloom = bloomsLevels.find(b=>b.id===state.blooms);
+    const rl = getRubricLevel(state.mastery);
+    const indicators = rubricIndicators[skill.id][rl];
+
+    // Summary
+    document.getElementById('result-skill').textContent = `ES${skill.num}: ${skill.name}`;
+    document.getElementById('result-mastery').textContent = masteryInfo[state.mastery].full;
+    document.getElementById('result-blooms').textContent = `${bloom.title} (${bloom.tag})`;
+
+    // Rubric context
+    const rubricBox = document.getElementById('rubric-context');
+    const levelWord = state.mastery === 'M' ? 'mastered' : (state.mastery === 'R' ? 'reinforced' : 'introduced');
+    rubricBox.innerHTML = `
+        <h4>What the Rubric Expects at This Level</h4>
+        <p>According to the CPE's performance indicators, students at the <strong>${getRubricLevelLabel(state.mastery)}</strong> level for this skill should be able to:</p>
+        <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
+        <p style="margin-top:10px;font-size:12.5px;color:var(--text-light);">These indicators can help you evaluate whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with both this rubric level and the cognitive level you selected.</p>
+    `;
+
+    // Alignment
+    const align = getAlignmentMessage(state.mastery, state.blooms);
+    document.getElementById('alignment-check').innerHTML = `
+        <h4><span>${align.icon}</span> ${align.title}</h4>
+        <p>${align.msg}</p>`;
+
+    // Assessments
+    const container = document.getElementById('solutions-container');
+    container.innerHTML = '';
+    assessments[state.blooms].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'solution-item';
+        div.innerHTML = `
+            <h4>${item.title}</h4>
+            <p>${item.desc}</p>
+            <p>${item.details}</p>
+            <div class="application-note">
+                <strong>In Your Course:</strong> ${item.appFn(skill, state.mastery)}
+            </div>`;
+        container.appendChild(div);
+    });
+
+    // Watchout
+    const tips = getWatchout(state.mastery, state.blooms);
+    document.getElementById('watchout-section').innerHTML = `
+        <h4><span>⚠️</span> Common Pitfalls to Watch For</h4>
+        ${tips.map(t=>`<p style="margin-bottom:10px;">${t}</p>`).join('')}`;
+
+    goToScreen('results-screen');
+}
+
+// ============================================================
+// RESTART
+// ============================================================
+function restartTool() {
+    state.skill=null; state.mastery=null; state.blooms=null;
+    document.querySelectorAll('.skill-card,.mastery-card,.blooms-card').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('skill-next').disabled=true;
+    document.getElementById('mastery-next').disabled=true;
+    document.getElementById('blooms-next').disabled=true;
+    goToScreen('welcome-screen');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderSkillCards();
+updateProgress();
+</script>
+</body>
+</html>
