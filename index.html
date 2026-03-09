@@ -1075,7 +1075,7 @@ function showResults() {
     const levelWord = state.mastery === 'M' ? 'mastered' : (state.mastery === 'R' ? 'reinforced' : 'introduced');
     rubricBox.innerHTML = `
         <h4>What the Rubric Expects at This Level</h4>
-        <p>According to the CPE's performance indicators, students at the <strong>${getRubricLevelLabel(state.mastery)}</strong> level for this skill should be able to:</p>
+        <p>According to the CPE's performance indicators, a student at the <strong>${getRubricLevelLabel(state.mastery)}</strong> level for this skill should be able to:</p>
         <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
         <p style="margin-top:10px;font-size:12.5px;color:var(--text-light);">These indicators can help you evaluate whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with both this rubric level and the cognitive level you selected.</p>
     `;
