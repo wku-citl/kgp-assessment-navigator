@@ -547,7 +547,6 @@
     </div>
 </div>
 
-
 <script>
 // ============================================================
 // SKILLS DATA
@@ -567,6 +566,7 @@ const skills = [
 
 // ============================================================
 // CPE RUBRIC PERFORMANCE INDICATORS
+// I & R both map to Milestone; M maps to Capstone
 // ============================================================
 const rubricIndicators = {
     es1: {
@@ -700,368 +700,416 @@ const rubricIndicators = {
     }
 };
 
-function getRubricLevel(m) { return m === 'M' ? 'capstone' : 'milestone'; }
-function getRubricLevelLabel(m) { return m === 'M' ? 'Capstone' : 'Milestone'; }
+function getRubricLevel(mastery) {
+    return mastery === 'M' ? 'capstone' : 'milestone';
+}
+function getRubricLevelLabel(mastery) {
+    return mastery === 'M' ? 'Capstone' : 'Milestone';
+}
 
+// ============================================================
+// MASTERY INFO
+// ============================================================
 const masteryInfo = {
     I: { label:"Introduced", full:"Introduced" },
     R: { label:"Reinforced", full:"Reinforced / Developed" },
     M: { label:"Mastered", full:"Mastered" }
 };
 
+// ============================================================
+// BLOOM'S LEVELS
+// ============================================================
 const bloomsLevels = [
-    { id:"remember", icon:"\u{1F4D6}", title:"Recall & Explain", tag:"Remember / Understand",
+    { id:"remember", icon:"📖", title:"Recall & Explain", tag:"Remember / Understand",
       desc:"Students identify, define, describe, or explain key concepts, terms, and principles. They can summarize ideas and demonstrate foundational knowledge.",
       verbs:"Common outcome verbs: define, describe, explain, identify, list, summarize, paraphrase, recognize",
       typicalFor:["I"] },
-    { id:"apply", icon:"\u{1F527}", title:"Apply & Implement", tag:"Apply",
+    { id:"apply", icon:"🔧", title:"Apply & Implement", tag:"Apply",
       desc:"Students use what they've learned to carry out procedures, solve problems, or complete tasks. They can transfer knowledge to familiar or moderately new situations.",
       verbs:"Common outcome verbs: apply, demonstrate, implement, solve, use, illustrate, calculate, practice",
       typicalFor:["I","R"] },
-    { id:"analyze", icon:"\u{1F52C}", title:"Analyze & Examine", tag:"Analyze",
+    { id:"analyze", icon:"🔬", title:"Analyze & Examine", tag:"Analyze",
       desc:"Students break down complex information, identify patterns and relationships, compare perspectives, and examine underlying assumptions or structures.",
       verbs:"Common outcome verbs: analyze, compare, contrast, differentiate, examine, organize, deconstruct, investigate",
       typicalFor:["R"] },
-    { id:"evaluate", icon:"\u{2696}\u{FE0F}", title:"Evaluate & Justify", tag:"Evaluate",
+    { id:"evaluate", icon:"⚖️", title:"Evaluate & Justify", tag:"Evaluate",
       desc:"Students make informed judgments about quality, credibility, or effectiveness. They assess approaches, critique ideas, and defend conclusions with evidence.",
       verbs:"Common outcome verbs: assess, critique, defend, evaluate, judge, justify, prioritize, recommend",
       typicalFor:["R","M"] },
-    { id:"create", icon:"\u{2728}", title:"Create & Design", tag:"Create",
+    { id:"create", icon:"✨", title:"Create & Design", tag:"Create",
       desc:"Students produce original work, develop new solutions, construct arguments, or design approaches. They synthesize knowledge into something that didn't exist before.",
       verbs:"Common outcome verbs: compose, construct, create, design, develop, formulate, generate, produce, propose",
       typicalFor:["M"] }
 ];
 
+// Alignment hints
 const alignmentHints = {
-    I: "Courses that <strong>introduce</strong> a skill typically have outcomes at the <em>Recall & Explain</em> or <em>Apply & Implement</em> level. Students are building foundational understanding, so it\u2019s natural for outcomes to focus on recognizing, explaining, or practicing the skill in structured contexts.",
+    I: "Courses that <strong>introduce</strong> a skill typically have outcomes at the <em>Recall & Explain</em> or <em>Apply & Implement</em> level. Students are building foundational understanding, so it's natural for outcomes to focus on recognizing, explaining, or practicing the skill in structured contexts.",
     R: "Courses that <strong>reinforce</strong> a skill typically have outcomes at the <em>Apply & Implement</em>, <em>Analyze & Examine</em>, or <em>Evaluate & Justify</em> level. Students should be moving beyond basic recall and beginning to use the skill more independently and in varied contexts.",
     M: "Courses where students are expected to <strong>master</strong> a skill typically have outcomes at the <em>Evaluate & Justify</em> or <em>Create & Design</em> level. At this stage, students should be demonstrating the skill with sophistication, often in authentic or professional scenarios."
 };
 
+// ============================================================
+// ASSESSMENT DATA — now with mastery-aware application notes
+// ============================================================
+const assessments = {
+    remember: [
+        { title:"Knowledge Checks & Quizzes",
+          desc:"Short-form assessments that verify students can recall and explain foundational concepts.",
+          details:"These work well early in a unit or module to confirm students have the base knowledge needed for more complex work. Consider low-stakes or practice formats that reduce test anxiety and encourage active study.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'M'
+                  ? `At the mastered level, the rubric expects students to do more than recall — for example, "${ind[0].toLowerCase()}." If your assessments focus primarily on recall, consider whether they capture the depth this level requires.`
+                  : `At this level, the rubric expects students to build toward competencies like "${ind[0].toLowerCase()}." Knowledge checks can confirm students have the foundational understanding to get there.`;
+          }
+        },
+        { title:"Concept Mapping",
+          desc:"Students visually organize and connect key ideas, showing how concepts relate to one another.",
+          details:"Concept maps reveal how students are organizing their understanding and can surface misconceptions early. They're especially useful for skills that involve interconnected ideas or processes.",
+          appFn:(sk,m) => `Ask students to create a concept map showing how the key components of ${sk.context} connect to one another and to their course content. This helps build the foundation for more complex work with this skill.`
+        },
+        { title:"Guided Reflection or Summary Writing",
+          desc:"Students articulate their understanding of key ideas in their own words through structured prompts.",
+          details:"Reflective writing helps students consolidate learning and gives you insight into their comprehension. Keep prompts focused and provide clear expectations for length and depth.",
+          appFn:(sk,m) => `Ask students to summarize the key principles of ${sk.context} and explain why these principles matter in their field of study. This builds awareness that supports deeper engagement later.`
+        },
+        { title:"Annotation & Reading Response",
+          desc:"Students engage with course texts by highlighting, annotating, and responding to key passages or data.",
+          details:"Structured annotation builds close reading habits and ensures students are actively engaging with material. Provide annotation guidelines or specific questions to focus attention.",
+          appFn:(sk,m) => `Have students annotate a discipline-relevant reading, identifying where the author demonstrates or discusses ${sk.context}, and explain their annotations in a brief response.`
+        }
+    ],
+    apply: [
+        { title:"Guided Case Studies",
+          desc:"Students apply concepts to realistic scenarios with structured questions that guide their analysis.",
+          details:"Case studies bridge theory and practice effectively. At the 'Apply' level, provide scaffolding through guiding questions or a structured framework. Students should demonstrate they can use what they've learned, not just describe it.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'I'
+                  ? `Present a scenario where ${sk.context} must be applied and provide guiding questions. The rubric expects students at this stage to "${ind[0].toLowerCase()}" — your case study can scaffold toward this.`
+                  : `Present a scenario requiring ${sk.context}. At the reinforced level, reduce scaffolding — the rubric expects students to "${ind[0].toLowerCase()}" with increasing independence.`;
+          }
+        },
+        { title:"Problem-Based Exercises",
+          desc:"Students work through defined problems using methods and concepts from the course.",
+          details:"Effective problem sets move beyond rote application — they require students to choose an approach, apply it correctly, and interpret results. Include problems of varying difficulty.",
+          appFn:(sk,m) => `Design exercises where students must use ${sk.context} to work through problems relevant to your course. Include both straightforward applications and scenarios that require students to navigate minor complications or make choices about approach.`
+        },
+        { title:"Practice Simulations or Role Plays",
+          desc:"Students practice the skill in a low-stakes, structured environment that mimics real application.",
+          details:"Simulations give students the experience of doing rather than just knowing. They're especially powerful for skills that involve interaction, decision-making, or professional behavior. Debrief afterward to reinforce learning.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return `Create a structured activity where students practice ${sk.context} in a simulated context. The rubric's expectation that students "${ind[ind.length-1].toLowerCase()}" can be practiced in a low-stakes simulation before being assessed in higher-stakes formats.`;
+          }
+        },
+        { title:"Demonstration or Skill Performance",
+          desc:"Students show they can carry out a procedure, process, or technique correctly.",
+          details:"Demonstrations are useful for skills that have observable steps or processes. Provide clear criteria so students understand what proficient performance looks like.",
+          appFn:(sk,m) => `Ask students to demonstrate their ability to apply ${sk.context} through a specific task relevant to your discipline. Use a clear rubric or checklist so students know what proficient performance looks like at this level.`
+        }
+    ],
+    analyze: [
+        { title:"Comparative Analysis",
+          desc:"Students examine multiple perspectives, approaches, or sources and identify meaningful similarities and differences.",
+          details:"Comparative work pushes students beyond surface understanding into deeper engagement with complexity. Provide a framework or set of criteria for comparison to keep the analysis focused.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('perspective') || i.toLowerCase().includes('analyz') || i.toLowerCase().includes('differentiat')) || ind[0];
+              return `Have students compare two or more approaches to ${sk.context} within your discipline. The rubric expects students at this level to "${relevant.toLowerCase()}" — a comparative analysis is a natural way to demonstrate this.`;
+          }
+        },
+        { title:"Data or Source Interpretation",
+          desc:"Students examine data, texts, or primary sources and draw evidence-based conclusions.",
+          details:"Interpretation assignments develop analytical rigor. Provide authentic or discipline-relevant materials and ask students to go beyond description to explain what the evidence means and why it matters.",
+          appFn:(sk,m) => `Provide discipline-relevant data or source material and ask students to analyze it through the lens of ${sk.context}. Students should identify patterns, draw conclusions, and explain their reasoning — moving beyond simple description into interpretation.`
+        },
+        { title:"Structured Debate or Discussion",
+          desc:"Students examine an issue from multiple sides, supporting claims with evidence and reasoning.",
+          details:"Structured debates develop analytical thinking while also building communication skills. Assign positions (rather than letting students choose) to ensure engagement with perspectives different from their own.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('perspective') || i.toLowerCase().includes('engag')) || ind[1] || ind[0];
+              return `Organize a structured discussion around a discipline-relevant question that requires students to analyze different dimensions of ${sk.context}. This aligns with the rubric expectation that students "${relevant.toLowerCase()}."`;
+          }
+        },
+        { title:"Process or Systems Analysis",
+          desc:"Students break down a complex process, system, or situation into component parts and examine how they interact.",
+          details:"Systems thinking is a powerful analytical skill. Ask students to map out a process, identify where breakdowns occur, or trace how changes in one part affect the whole.",
+          appFn:(sk,m) => `Ask students to deconstruct a real-world example from your discipline, identifying the components related to ${sk.context} and explaining how they interact and influence outcomes.`
+        }
+    ],
+    evaluate: [
+        { title:"Critique & Peer Review",
+          desc:"Students assess the quality of work — their own, their peers', or professional examples — using defined criteria.",
+          details:"Evaluation skills develop when students practice applying standards of quality. Provide rubrics or evaluation criteria, and teach students how to give constructive, evidence-based feedback.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              const relevant = ind.find(i => i.toLowerCase().includes('evaluat') || i.toLowerCase().includes('critiqu') || i.toLowerCase().includes('assess') || i.toLowerCase().includes('feedback')) || ind[0];
+              return `Have students evaluate an example of ${sk.context} in practice — peer work, a professional example, or a case study — using criteria you provide or that they help develop. The rubric's expectation that students "${relevant.toLowerCase()}" is well-served by critique-based assessments.`;
+          }
+        },
+        { title:"Position or Argument Paper",
+          desc:"Students take a stance on a debatable issue and defend it with evidence, while acknowledging counterarguments.",
+          details:"Position papers require students to move beyond summary into judgment. Effective prompts present genuine tensions or trade-offs rather than questions with obvious answers.",
+          appFn:(sk,m) => `Assign a paper where students take and defend a position on a debatable question related to ${sk.context} in your discipline, supporting their argument with course concepts and credible evidence while engaging with counterarguments.`
+        },
+        { title:"Evaluation Rubric Development",
+          desc:"Students create or refine criteria for evaluating quality in relation to the skill being assessed.",
+          details:"When students help define what 'good' looks like, they develop deeper understanding of the skill itself. This builds metacognitive skills and helps students become more effective self-assessors.",
+          appFn:(sk,m) => `Ask students to develop evaluation criteria for assessing ${sk.context} in a professional context. What distinguishes excellent performance from adequate? What evidence would demonstrate proficiency?`
+        },
+        { title:"Evidence-Based Recommendation",
+          desc:"Students assess a situation and recommend a course of action, justifying their recommendation with evidence.",
+          details:"Recommendation-based assessments mirror professional decision-making. Students must weigh options, consider constraints, and make defensible choices — all hallmarks of evaluative thinking.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id][getRubricLevel(m)];
+              return m === 'M'
+                  ? `Present a complex, discipline-relevant scenario and ask students to evaluate the situation, weigh multiple options, and produce a justified recommendation. At the mastered level, the rubric expects students to "${ind[0].toLowerCase()}" — this assessment type maps directly to that expectation.`
+                  : `Present a discipline-relevant scenario and ask students to evaluate the situation, consider options, and recommend an approach grounded in principles of ${sk.context}.`;
+          }
+        }
+    ],
+    create: [
+        { title:"Original Project or Design",
+          desc:"Students produce an original work product that demonstrates sophisticated application of the skill in an authentic context.",
+          details:"Creative projects should have clear parameters and assessment criteria even though the final product is original. Provide enough structure to ensure rigor while leaving room for student creativity and disciplinary application.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Assign a project where students design or produce something original that demonstrates mastery of ${sk.context}. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — an original project is one of the most authentic ways to assess this.`;
+          }
+        },
+        { title:"Portfolio with Reflective Commentary",
+          desc:"Students curate a collection of their work that demonstrates growth and competence, accompanied by reflective analysis.",
+          details:"Portfolios are powerful for skills that develop over time. The reflective component is key — it's where students demonstrate they can not only perform the skill but understand their own development.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The capstone rubric expects students to "${ind[ind.length-1].toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
+          }
+        },
+        { title:"Capstone or Culminating Experience",
+          desc:"Students undertake a substantial, integrative project that requires them to synthesize learning from across the curriculum.",
+          details:"Capstone experiences should require students to independently draw on and integrate multiple skills and knowledge areas. They often include both a product and presentation component.",
+          appFn:(sk,m) => {
+              const ind = rubricIndicators[sk.id].capstone;
+              return `Design a culminating experience where students independently apply ${sk.context} at a professional level. The rubric expects graduates to "${ind[0].toLowerCase()}" — a capstone experience allows students to demonstrate this through a substantial, integrative project.`;
+          }
+        },
+        { title:"Professional Presentation or Publication",
+          desc:"Students create and deliver work in a format appropriate to professional practice in their discipline.",
+          details:"Asking students to communicate their work to an authentic audience raises the stakes and mirrors professional expectations. Consider conference-style presentations, white papers, or public-facing deliverables.",
+          appFn:(sk,m) => `Ask students to produce a professional-quality deliverable related to ${sk.context} that could serve an authentic audience — a presentation, report, proposal, or publication appropriate to your discipline.`
+        }
+    ]
+};
+
 
 // ============================================================
-// SKILL-SPECIFIC ASSESSMENTS (200 entries)
+// SKILL-SPECIFIC APPLICATION NOTES
+// For experiential/relational skills where generic academic
+// assessment language doesn't capture the skill authentically
 // ============================================================
-const SA = {};
-SA.es1 = {
-remember: [
-  {title:"Communication Concepts Quiz",desc:"Short assessment verifying students can identify and explain principles of effective communication.",details:"Use a mix of question types to assess whether students can distinguish between effective and ineffective communication strategies and explain why each matters.",app:m=>"Ask students to identify examples of effective listening, writing, and speaking strategies, and explain why these strategies support professional communication."},
-  {title:"Communication Modes Concept Map",desc:"Students visually organize the relationships between listening, writing, speaking, and presenting.",details:"Concept maps help students see how different communication modes connect and support one another. Ask students to include examples of when each mode is most appropriate.",app:m=>"Have students create a map showing how active listening, structured writing, oral communication, and professional presentation connect to one another and to success in their field."},
-  {title:"Reflective Communication Journal",desc:"Students describe their own communication strengths, habits, and areas for growth through guided prompts.",details:"Structured reflection builds the self-awareness that underpins communication improvement. Provide specific prompts rather than open-ended tasks.",app:m=>"Ask students to describe a recent communication experience and explain what went well, what they would change, and what communication principles were at play."},
-  {title:"Active Listening and Reading Response",desc:"Students engage with a professional communication example and identify key principles in action.",details:"Give students a professional communication example (a recorded presentation, a well-crafted memo, a dialogue) and ask them to annotate and identify the specific strategies being used.",app:m=>"Provide a recorded or written professional communication example and ask students to identify the listening, writing, or speaking strategies used and explain why each is effective."}
-],
-apply: [
-  {title:"Professional Writing Exercise",desc:"Students draft a formal written communication suited to a specific audience and purpose.",details:"Provide a realistic scenario with a clear audience and purpose. Assess whether students can organize their ideas logically, use appropriate tone, and follow conventions of professional writing.",app:m=>m==='I'?"Give students a scenario requiring written communication with clear guidelines about audience and purpose. Provide a model or template as scaffolding.":m==='M'?"Ask students to produce a polished, audience-tailored professional communication that demonstrates mastery of tone, structure, vocabulary, and purpose — at a level appropriate for professional practice.":"Assign a writing task where students must tailor their communication to a specific professional audience without a template, demonstrating independent production of clear, well-organized writing."},
-  {title:"Structured Oral Presentation",desc:"Students prepare and deliver a presentation on a course-relevant topic.",details:"Even at the practice level, provide clear expectations for structure, delivery, and time. Consider low-stakes formats like small-group presentations before building to whole-class delivery.",app:m=>"Have students prepare and deliver a presentation on a topic from your course. Provide criteria for organization, clarity, professional delivery, and audience engagement."},
-  {title:"Active Listening Demonstration",desc:"Students practice and demonstrate active listening through a structured conversational exercise.",details:"Pair students for a structured exchange where one speaks and the other practices active listening — paraphrasing, asking clarifying questions, noting nonverbal cues. Debrief afterward.",app:m=>"Set up a paired exercise where students practice focused listening, ask clarifying questions, and summarize what they heard. Assess whether they demonstrate awareness of verbal and nonverbal signals."},
-  {title:"Audience-Adapted Communication",desc:"Students communicate the same content to two different audiences, adjusting tone, vocabulary, and format.",details:"This exercise builds a critical communication skill: tailoring a message. Provide two distinct audience scenarios and assess how effectively students adjust their approach.",app:m=>"Give students content and ask them to communicate it in two formats for two different audiences — for example, a technical summary for colleagues and a plain-language explanation for a general audience."}
-],
-analyze: [
-  {title:"Rhetorical and Strategic Analysis",desc:"Students examine a professional communication and analyze the strategies used to achieve its purpose.",details:"Provide a piece of professional communication and ask students to identify and analyze the rhetorical choices: audience awareness, structure, tone, evidence use, and persuasive techniques.",app:m=>"Have students analyze a professional communication from your discipline, identifying how the author or speaker tailored their message and what strategies made it effective or ineffective."},
-  {title:"Communication Breakdown Case Study",desc:"Students analyze a scenario where communication failed and identify what went wrong and why.",details:"Use a real or realistic case where miscommunication led to negative outcomes. Ask students to trace the breakdown to specific failures in listening, writing, or speaking.",app:m=>"Present a case study where a communication failure led to a problem and ask students to analyze the root causes — examining the specific listening, writing, or speaking breakdowns that occurred."},
-  {title:"Comparative Communication Analysis",desc:"Students compare two examples of communication on the same topic and analyze what makes one more effective.",details:"Provide two versions of the same message and ask students to analyze the differences in structure, tone, audience awareness, and clarity.",app:m=>"Give students two professional communications addressing the same topic and ask them to compare their effectiveness, analyzing differences in writing quality, organization, and audience adaptation."},
-  {title:"Nonverbal and Contextual Communication Analysis",desc:"Students examine how nonverbal cues, tone, and context shape the effectiveness of a message.",details:"Provide video of a presentation or meeting and ask students to analyze how nonverbal elements supported or undermined the verbal message.",app:m=>"Show students a recorded professional exchange and ask them to analyze how nonverbal signals, tone, and context reinforced or contradicted the spoken or written message."}
-],
-evaluate: [
-  {title:"Peer Review of Communication",desc:"Students evaluate a classmate's written or oral communication using defined criteria and provide constructive feedback.",details:"Provide a rubric focused on clarity, organization, audience awareness, and professional tone. Teach students what constructive feedback looks like before the exercise.",app:m=>m==='I'?"Have students review a classmate\'s writing or presentation using an evaluation rubric you provide, focusing on clarity, structure, and professional tone.":m==='M'?"Have students evaluate a peer\'s professional communication using criteria they help develop. At this level, providing effective feedback is itself a demonstration of communication mastery.":"Have students evaluate a peer\'s communication with increasing independence in applying criteria and providing specific, actionable feedback."},
-  {title:"Communication Effectiveness Critique",desc:"Students evaluate a professional communication artifact and assess its strengths and weaknesses.",details:"Provide a real communication product from the discipline and ask students to evaluate its effectiveness using course concepts.",app:m=>"Give students a professional communication example from your discipline and ask them to evaluate what works, what does not, and what specific changes would improve it."},
-  {title:"Self-Assessment of Communication Growth",desc:"Students evaluate their own development as communicators using evidence from their coursework.",details:"Ask students to review their own communication artifacts and honestly assess their growth. The quality of the self-assessment reveals their understanding of effective communication.",app:m=>"Ask students to select examples of their own communication work and evaluate their growth — identifying specific strengths and areas where they still need improvement."},
-  {title:"Communication Strategy Recommendation",desc:"Students assess a communication challenge and recommend an approach, justifying their choices.",details:"Present a scenario where the communication approach matters and ask students to evaluate options and recommend a strategy.",app:m=>"Present a professional communication challenge from your discipline and ask students to evaluate the situation, consider multiple approaches, and recommend a communication strategy with clear justification."}
-],
-create: [
-  {title:"Professional Communication Portfolio",desc:"Students compile their best communication work with reflective analysis of their development.",details:"The portfolio should include writing, presentation materials, and evidence of listening and collaboration skills. The reflective component should demonstrate self-assessment of communication effectiveness.",app:m=>"Have students assemble a portfolio showcasing their strongest writing, presentation, and interpersonal communication work, with reflection analyzing their growth and remaining development goals."},
-  {title:"Original Professional Presentation",desc:"Students design and deliver a polished presentation on a complex topic for a professional audience.",details:"Assess not just content accuracy but sophisticated audience adaptation, professional delivery, visual design, and the ability to handle questions.",app:m=>"Ask students to prepare, structure, and deliver a professional-quality presentation tailored to a specific professional audience, demonstrating the ability to communicate complex ideas clearly and effectively."},
-  {title:"Tailored Communication Package",desc:"Students create communication materials on the same topic adapted for multiple audiences and formats.",details:"This capstone-level task requires students to demonstrate they can shift register, format, and strategy depending on audience and purpose.",app:m=>"Assign a project where students produce communication materials for multiple audiences — for example, a technical report, an executive summary, and a public-facing brief — demonstrating they can tailor their message to context and purpose."},
-  {title:"Facilitated Discussion or Meeting",desc:"Students plan and lead a structured group conversation, demonstrating advanced listening and speaking skills.",details:"Facilitating conversation requires active listening, clear speaking, reading nonverbal cues, and managing group dynamics. Provide clear criteria for effective facilitation.",app:m=>"Have students plan and facilitate a structured discussion or meeting on a course-relevant topic, demonstrating active listening, professional communication, and the ability to manage group dynamics."}
-]
+const skillSpecificApps = {
+    es4: {
+        remember: [
+            (sk,m) => "Use short assessments to verify students can identify key concepts related to effective interpersonal interaction — such as recognizing how personal perspectives shape communication, distinguishing between productive and unproductive interaction patterns, or explaining why self-awareness matters in collaborative settings.",
+            (sk,m) => "Have students map the relationships between self-awareness, perspective-taking, active listening, and respectful communication — showing how these elements work together to create effective interactions in academic and professional settings.",
+            (sk,m) => "Ask students to reflect on a recent interaction — in class, at work, or in their community — and describe how their own perspectives and assumptions influenced the exchange. This builds the self-awareness the rubric identifies as foundational to this skill.",
+            (sk,m) => "Have students read a case study or narrative depicting an interpersonal exchange and annotate the moments where perspectives, assumptions, or communication patterns influenced the outcome, explaining what they noticed."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a scenario involving an interpersonal challenge — a workplace misunderstanding, a team disagreement, or a cross-cultural interaction — and provide guiding questions that help students apply principles of effective interpersonal communication to propose a response."
+                : "Present an interpersonal challenge scenario and ask students to apply interaction strategies with less scaffolding. At this level, students should be able to independently identify positive ways to interact and explain the reasoning behind their approach.",
+            (sk,m) => "Give students a series of interpersonal scenarios — a difficult conversation with a colleague, navigating disagreement in a group, responding to constructive feedback — and ask them to practice applying specific interaction strategies, explaining their reasoning for each choice.",
+            (sk,m) => "This is where this skill comes alive. Have students role-play interpersonal scenarios — a challenging workplace conversation, a cross-perspective dialogue, or a collaborative decision-making situation — and debrief afterward about what they noticed about their own communication patterns and assumptions.",
+            (sk,m) => "Ask students to demonstrate effective interpersonal skills in a structured interaction — such as an active listening exercise, a perspective-taking conversation, or a collaborative problem-solving session — using a clear rubric that identifies the specific behaviors you're looking for."
+        ],
+        analyze: [
+            (sk,m) => "Have students analyze two interpersonal interactions — drawn from case studies, observed situations, or their own experiences — comparing what made one interaction effective and another less so. Ask them to identify how self-awareness, perspective-taking, and communication patterns influenced each outcome.",
+            (sk,m) => "Provide a detailed case study of a complex interpersonal situation — a workplace conflict, a cross-cultural misunderstanding, or a team breakdown — and ask students to analyze the perspectives, assumptions, and dynamics at play, explaining how these factors shaped the interaction.",
+            (sk,m) => "Facilitate a structured discussion around an interpersonal scenario, asking students to examine the situation from the perspectives of all parties involved. This requires students to move beyond their own viewpoint and analyze how different lived experiences and assumptions led to different interpretations of the same event.",
+            (sk,m) => "Ask students to map the dynamics of a real or hypothetical interpersonal interaction — identifying the perspectives, communication patterns, power dynamics, and assumptions involved — and analyze how these elements influenced the relationship or outcome."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students observe or review a recorded interpersonal interaction (a negotiation, a team meeting, a difficult conversation) and evaluate its effectiveness using criteria tied to self-awareness, perspective-taking, and respectful communication. At the mastered level, students should be able to develop and apply their own evaluation criteria."
+                : "Have students observe or review an interpersonal interaction and evaluate its effectiveness using criteria you provide — focused on self-awareness, perspective-taking, and respectful communication. Alternatively, have students give and receive structured peer feedback on their own interpersonal skills during a collaborative exercise.",
+            (sk,m) => "Assign a paper where students take a position on a question related to interpersonal effectiveness — for example, whether a particular approach to conflict resolution is effective, or how self-awareness should be prioritized in professional interactions — and defend their position with evidence from course concepts and their own experience.",
+            (sk,m) => "Ask students to develop criteria for evaluating the quality of interpersonal interactions in a professional context relevant to their discipline. What distinguishes someone who interacts effectively with others from someone who doesn't? What observable behaviors would you look for?",
+            (sk,m) => "Present a scenario involving interpersonal challenges in a professional setting and ask students to evaluate the situation, consider multiple approaches, and recommend a strategy for improving the interpersonal dynamics, grounding their recommendation in course concepts."
+        ],
+        create: [
+            (sk,m) => "Have students design a resource, training module, or workshop focused on building effective interpersonal skills in a context relevant to their discipline — such as a guide for navigating difficult conversations, a training for new team members, or a framework for cross-perspective dialogue.",
+            (sk,m) => "Have students compile evidence of their interpersonal skill development — including reflections on interactions, self-assessments, peer feedback, and examples of how they applied perspective-taking and self-awareness in real situations — with reflective commentary analyzing their growth.",
+            (sk,m) => "Design a culminating experience where students must demonstrate effective interpersonal skills in an authentic, complex context — facilitating a difficult group conversation, mediating a conflict, leading a cross-functional team exercise, or conducting stakeholder interviews that require genuine perspective-taking.",
+            (sk,m) => "Ask students to develop and deliver a professional-quality analysis of interpersonal dynamics in their field — this could be a presentation on how effective interaction impacts outcomes in their discipline, a case study analysis, or a facilitated dialogue they design and lead."
+        ]
+    },
+    es5: {
+        remember: [
+            (sk,m) => "Verify students can identify key concepts related to adaptability and leadership — such as describing how effective leaders respond to change, recognizing strategies for motivating others, or explaining why flexibility and a positive mindset matter in team and workplace settings.",
+            (sk,m) => "Have students map the connections between adaptability, leadership, motivation, and goal achievement — showing how responding to change, supporting others, and maintaining a positive mindset work together in professional and team contexts.",
+            (sk,m) => "Ask students to reflect on a time they experienced a significant change — in a course, a job, or a team — and describe how they responded, what they learned, and what they might do differently. This builds the self-awareness that supports adaptive behavior.",
+            (sk,m) => "Have students read a case study or article about a leader navigating change and annotate the specific strategies, decisions, and behaviors that demonstrated adaptability and effective leadership, explaining why each mattered."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a scenario where a team or organization faces unexpected change — a shift in project scope, a resource loss, a new directive — and provide guiding questions that help students apply leadership and adaptability principles to develop a response plan."
+                : "Present a change scenario and ask students to develop a response with less scaffolding. At this level, students should be practicing how to adjust to new situations independently and encourage others to persist through the transition.",
+            (sk,m) => "Give students a series of scenarios involving change and uncertainty, and ask them to practice responding with specific adaptive strategies — adjusting plans, re-motivating a discouraged team, or pivoting approaches when initial solutions don't work.",
+            (sk,m) => "Simulate a situation where conditions change mid-task — reassign roles, alter the parameters, introduce new constraints — and ask students to lead their peers through the adjustment. Debrief afterward about how they adapted and what they noticed about group dynamics during the transition.",
+            (sk,m) => "Ask students to demonstrate adaptive leadership in a structured exercise — leading a group through a problem-solving activity where conditions shift partway through, showing they can adjust their approach while supporting others."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two leadership responses to significant change — from case studies, historical examples, or their own field — analyzing what strategies were effective, what fell short, and how context influenced the outcomes.",
+            (sk,m) => "Provide a case study of an organization or team navigating a major transition and ask students to analyze the leadership decisions, adaptive strategies, and group dynamics at play, identifying what contributed to or hindered successful adaptation.",
+            (sk,m) => "Facilitate a discussion around competing approaches to leading through change — for example, directive versus collaborative leadership during a crisis — requiring students to analyze the strengths and limitations of each approach in different contexts.",
+            (sk,m) => "Ask students to map how a change event rippled through a team, organization, or project — identifying which adaptive strategies were employed at each stage, where resistance emerged, and how leadership behaviors influenced the trajectory of the transition."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate a leadership scenario and assess the leader's effectiveness in navigating change. At the mastered level, students should apply sophisticated judgment — recognizing that effective adaptive leadership involves anticipating change, modeling new strategies, and coaching others through transitions."
+                : "Have students observe a leadership scenario (live, recorded, or described in a case study) and evaluate the leader's effectiveness in navigating change, using criteria related to adaptability, communication, and supporting others.",
+            (sk,m) => "Assign a paper where students take and defend a position on a leadership or adaptability question relevant to their discipline — for example, whether a particular change management approach is effective, or what role coaching plays in helping others adapt to new circumstances.",
+            (sk,m) => "Ask students to develop criteria for evaluating effective adaptive leadership. What does it look like when someone leads well through change? What behaviors, decisions, and communication patterns distinguish effective adaptation from reactive scrambling?",
+            (sk,m) => "Present a scenario where a team or organization is struggling to adapt to change, and ask students to evaluate the situation, identify barriers, and recommend a leadership approach grounded in course concepts."
+        ],
+        create: [
+            (sk,m) => "Have students design a change management plan, leadership development resource, or adaptive strategy for a real or hypothetical challenge in their discipline — demonstrating they can anticipate obstacles, plan for transitions, and build in support for others.",
+            (sk,m) => "Have students compile evidence of their growth in adaptability and leadership — including reflections on how they navigated change, feedback from peers on their leadership, and examples of coaching or supporting others — with reflective commentary analyzing their development.",
+            (sk,m) => "Design a culminating experience where students must lead a team or group through a complex, authentic challenge that requires genuine adaptation — managing a multi-phase project where conditions shift, facilitating a community initiative, or leading a team through a real problem with no predetermined solution.",
+            (sk,m) => "Ask students to develop and present a professional-quality proposal or analysis related to adaptive leadership — such as a change management plan, a leadership case study, or a workshop they design on leading through uncertainty in their field."
+        ]
+    },
+    es6: {
+        remember: [
+            (sk,m) => "Verify students can identify key elements of professional behavior — such as describing ethical principles relevant to their field, explaining why time management and accountability matter in professional settings, or recognizing examples of professional and unprofessional conduct.",
+            (sk,m) => "Have students map the relationships between the components of professionalism — ethics, accountability, time management, initiative, and field-specific knowledge — showing how these elements work together in a professional context relevant to their discipline.",
+            (sk,m) => "Ask students to reflect on what professionalism means in their intended field — what does ethical behavior look like? What are the expectations for accountability and reliability? This builds awareness of professional standards before students are expected to demonstrate them independently.",
+            (sk,m) => "Have students read a professional code of ethics or a case study depicting professional behavior in their field and annotate the key principles, standards, and expectations, explaining why each matters for practitioners."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a professional scenario involving an ethical dilemma, a time management challenge, or an accountability question, and provide guiding questions that help students apply professional principles to determine an appropriate course of action."
+                : "Present professional scenarios and ask students to apply professional standards with increasing independence. At this level, the rubric expects students to make ethical choices, manage priorities, and take accountability for their actions.",
+            (sk,m) => "Give students a series of realistic professional challenges — meeting competing deadlines, responding to an ethical gray area, handling a mistake, giving and receiving feedback — and ask them to practice applying professional standards to each, explaining their reasoning.",
+            (sk,m) => "Simulate a professional situation where students must demonstrate professional behavior — managing a project timeline, responding to an ethical concern, or handling constructive feedback. Debrief afterward about what professional choices they made and why.",
+            (sk,m) => "Ask students to demonstrate professionalism through a structured task — completing a project with professional-quality deliverables, meeting deadlines, using field-appropriate terminology, and responding to feedback. Use a rubric that assesses the professional behaviors, not just the content."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare professional standards or ethical codes from two different contexts within their discipline — or compare how two professionals handled a similar ethical dilemma — analyzing what principles were applied, what was at stake, and what led to different outcomes.",
+            (sk,m) => "Provide a case study of a professional or ethical situation in students' field and ask them to analyze the decisions made, the professional standards at play, and the consequences — going beyond description to examine the reasoning and implications.",
+            (sk,m) => "Facilitate a structured discussion around a professional or ethical dilemma relevant to the discipline, requiring students to analyze competing obligations, examine the perspectives of different stakeholders, and articulate what professional standards require in that situation.",
+            (sk,m) => "Ask students to examine how professional standards and ethical practices function within an organization or field — identifying where breakdowns in professionalism occur, how accountability systems work, and what structural factors support or undermine ethical behavior."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate professional work products — their own or their peers' — against professional standards in their field. At the mastered level, students should be modeling ethical behavior and using feedback to improve their own performance, so peer evaluation becomes both an assessment of professionalism and a demonstration of it."
+                : "Have students evaluate professional work products or conduct — their own or their peers' — against professional standards in their field. This could include assessing the quality, timeliness, and ethical integrity of deliverables, and providing constructive feedback.",
+            (sk,m) => "Assign a paper where students take and defend a position on a professional or ethical question relevant to their discipline — for example, how to handle a specific ethical dilemma, what constitutes professional accountability in a given context, or how industry standards should evolve.",
+            (sk,m) => "Ask students to develop criteria for evaluating professionalism in their field. What behaviors distinguish a highly professional practitioner from one who is merely adequate? What role do ethics, initiative, and accountability play?",
+            (sk,m) => "Present a scenario involving a professional standards or ethics issue and ask students to assess the situation, consider the perspectives of all stakeholders, and recommend a course of action grounded in the professional code of ethics and best practices of their field."
+        ],
+        create: [
+            (sk,m) => "Have students develop a professional resource for their discipline — such as an ethical decision-making framework, a professional development plan, an onboarding guide for new practitioners, or a set of professional standards for a specific workplace context.",
+            (sk,m) => "Have students compile evidence of their professional development — including reflections on ethical decision-making, examples of meeting professional standards, feedback they've received and responded to, and documentation of initiative — with commentary analyzing their growth as a professional.",
+            (sk,m) => "Design a culminating experience where students must demonstrate professionalism at a level expected of an entry-level practitioner in their field — an internship deliverable, a professional project completed to industry standards, or a comprehensive demonstration of field-specific competence with ethical integrity.",
+            (sk,m) => "Ask students to produce a professional-quality deliverable that demonstrates their command of field-specific knowledge, ethical standards, and professional communication — presented in a format appropriate to their discipline and audience."
+        ]
+    },
+    es8: {
+        remember: [
+            (sk,m) => "Verify students can identify key principles of effective teamwork — such as explaining the importance of shared goals, describing strategies for constructive conflict resolution, or recognizing how individual roles and responsibilities contribute to team success.",
+            (sk,m) => "Have students map the components of effective teamwork — shared goals, role clarity, communication, conflict management, trust, and accountability — showing how these elements support or undermine team performance.",
+            (sk,m) => "Ask students to reflect on a past team experience — what made the collaboration effective or ineffective? What role did they play, and how did their contributions support or hinder the team's goals? This builds self-awareness about collaborative patterns.",
+            (sk,m) => "Have students read a case study or article about team dynamics and annotate the moments where collaboration succeeded or broke down, identifying specific behaviors, communication patterns, or structural factors that influenced the outcome."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a scenario involving a team facing a collaboration challenge — unequal contribution, role confusion, or communication breakdowns — and provide guiding questions that help students apply teamwork principles to propose solutions."
+                : "Design team-based activities where students must work through real collaborative challenges. At this level, the rubric expects students to contribute ideas aligned to team objectives and address conflicts constructively — the exercise should create genuine opportunities for both.",
+            (sk,m) => "Design team-based exercises where students must work through a structured problem together, practicing specific collaboration skills like role negotiation, task distribution, and constructive feedback. The problem should require genuine interdependence rather than parallel individual work.",
+            (sk,m) => "Place students in a simulated team scenario where they must navigate a collaborative challenge — assign roles with competing priorities, introduce a conflict that must be resolved, or require consensus on a difficult decision. Debrief about what collaboration strategies they used and what they would do differently.",
+            (sk,m) => "Ask students to demonstrate effective team collaboration through a structured group task — with clear assessment of both the team's process (communication, role distribution, conflict management) and their product, using criteria that value collaboration as much as the final output."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two team experiences — from case studies, observed groups, or their own collaborative work — analyzing what factors made one team more effective than the other. Ask them to examine communication patterns, role dynamics, and conflict management approaches.",
+            (sk,m) => "Provide data or a detailed account of a team's collaborative process (meeting notes, peer evaluations, a project post-mortem) and ask students to analyze the dynamics — identifying strengths, breakdowns, patterns in contribution, and how the team managed conflict or change.",
+            (sk,m) => "Facilitate a discussion around a question about team dynamics — for example, how to handle a team member who isn't contributing, whether consensus or majority-rule is more effective, or how to balance individual strengths with team needs — requiring students to analyze the issue from multiple perspectives.",
+            (sk,m) => "Ask students to map the dynamics of a real or simulated team process — identifying how goals were set, roles distributed, conflicts addressed, and decisions made — and analyze where the collaboration was effective and where it broke down."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate their team's collaborative process using structured peer evaluation that assesses contribution, communication, adaptability, and conflict management. At the mastered level, the rubric expects students to foster team cohesion by giving and soliciting feedback — peer evaluation becomes both the assessment and the demonstration of the skill."
+                : "Have students evaluate their team's collaborative process — using structured peer evaluation that assesses contribution, communication, adaptability, and conflict management. Alternatively, have teams evaluate case studies of other teams' collaborative practices using defined criteria.",
+            (sk,m) => "Assign a paper where students take and defend a position on a teamwork or collaboration question relevant to their discipline — for example, what the most important factor in team success is, how to handle specific collaborative challenges, or what distinguishes functional from dysfunctional teams.",
+            (sk,m) => "Ask students to create criteria for evaluating effective collaboration. What observable behaviors indicate a team is working well together? How would you assess individual contribution to a team effort without simply counting outputs?",
+            (sk,m) => "Present a scenario where a team is struggling with collaboration issues and ask students to evaluate the situation, diagnose what's going wrong, and recommend specific strategies grounded in teamwork principles from the course."
+        ],
+        create: [
+            (sk,m) => "Have students design a resource for building effective teams — such as a team charter template, a conflict resolution protocol, a collaboration guide for their discipline, or a workshop on team dynamics. The product itself should demonstrate their understanding of what makes collaboration work.",
+            (sk,m) => "Have students compile evidence of their collaborative skill development — including reflections on team experiences, peer feedback, examples of how they navigated conflict or adapted their role, and self-assessments — with reflective commentary analyzing their growth as a team member.",
+            (sk,m) => "Design a culminating team project that requires genuine collaboration on a complex, authentic problem — where the product could not be created by individuals working separately. Assess both the final deliverable and the team's collaborative process, including how they navigated challenges and leveraged each member's strengths.",
+            (sk,m) => "Ask the student team to present their collaborative work to an authentic audience — documenting not just their results but their process, including how they managed roles, resolved conflicts, and made decisions as a team."
+        ]
+    }
 };
-SA.es2 = {
-remember: [
-  {title:"Critical Thinking Concepts Quiz",desc:"Short assessment verifying students can identify and explain key principles of critical and creative thinking.",details:"Assess whether students can define core concepts — assumptions, evidence, bias, perspectives, logical reasoning — and explain why each matters in problem-solving.",app:m=>"Ask students to define key critical thinking concepts and explain how assumptions, evidence, and multiple perspectives contribute to effective problem-solving."},
-  {title:"Problem-Solving Concept Map",desc:"Students map the components involved in defining, analyzing, and solving problems.",details:"Ask students to visually organize the elements — identifying issues, locating information, recognizing assumptions, considering perspectives, developing solutions — showing how they connect.",app:m=>"Have students create a concept map showing how the components of problem-solving relate: defining the problem, gathering information, identifying assumptions, considering perspectives, and developing solutions."},
-  {title:"Assumptions and Perspectives Reflection",desc:"Students describe their own thinking habits and how personal perspectives may help or hinder their problem-solving.",details:"This builds metacognitive awareness. Ask students to be specific about assumptions they tend to make and how those assumptions shape their analysis.",app:m=>"Ask students to reflect on a problem they have encountered and describe how their own perspectives and assumptions influenced their thinking — and what they might have missed."},
-  {title:"Argument Identification Exercise",desc:"Students read a text and identify the claims, evidence, assumptions, and reasoning being used.",details:"Give students a discipline-relevant argument and ask them to distinguish between claims and evidence, identify assumptions, and summarize the logical structure.",app:m=>"Provide a discipline-relevant reading and ask students to identify the main argument, the evidence supporting it, and any assumptions the author is making."}
-],
-apply: [
-  {title:"Guided Case Study",desc:"Students apply critical thinking concepts to a realistic problem scenario with structured support.",details:"Provide a case study with guiding questions that walk students through problem identification, information gathering, perspective consideration, and solution development.",app:m=>m==='I'?"Present a case study with guiding questions that scaffold the thinking process — helping students practice identifying the problem, locating relevant information, and considering different perspectives.":m==='M'?"Present a complex case requiring students to analyze the problem using credible sources, evaluate alternative perspectives, and synthesize evidence to draw informed conclusions.":"Present a case study with less scaffolding, asking students to independently identify the problem, use relevant sources, and consider multiple perspectives before proposing a solution."},
-  {title:"Creative Problem-Solving Exercise",desc:"Students apply brainstorming and ideation techniques to generate multiple solutions to a defined problem.",details:"Give students a problem and a structured ideation framework. Assess both the quantity and quality of ideas and whether students can explain the reasoning behind their proposals.",app:m=>"Present a problem relevant to your course and ask students to generate multiple possible solutions using a structured creative thinking technique, linking concepts together to produce novel ideas."},
-  {title:"Perspective-Taking Application",desc:"Students apply different perspectives to the same problem and explore how each changes the analysis.",details:"Assign specific perspectives to adopt when analyzing a problem. This builds the habit of seeking out and considering different viewpoints.",app:m=>"Give students a problem and ask them to analyze it from two or more assigned perspectives, explaining how different viewpoints lead to different interpretations and potential solutions."},
-  {title:"Structured Problem Analysis",desc:"Students apply a problem-solving framework to break down and work through a course-relevant problem.",details:"Provide a framework (define, analyze, generate options, evaluate, decide) and ask students to apply it step by step. Assess process and reasoning, not just the final answer.",app:m=>"Assign a problem and a step-by-step framework. Ask students to work through each stage — defining the problem, identifying relevant patterns, and articulating factors that influence potential solutions."}
-],
-analyze: [
-  {title:"Evidence and Assumptions Analysis",desc:"Students examine an argument or proposal, identifying underlying assumptions and evaluating the evidence.",details:"Provide a discipline-relevant argument and ask students to separate claims from evidence, surface hidden assumptions, and assess the strength of the reasoning.",app:m=>"Give students a discipline-relevant argument and ask them to identify the assumptions, evaluate the evidence quality, and analyze whether the conclusions follow logically."},
-  {title:"Multi-Perspective Problem Analysis",desc:"Students analyze a complex problem from multiple stakeholder perspectives, comparing how each frames the issue.",details:"This develops the ability to analyze how different assumptions and priorities lead to fundamentally different understandings of the same problem.",app:m=>"Present a complex problem and ask students to analyze it from multiple stakeholder perspectives, comparing how different assumptions and priorities lead to different framings and potential solutions."},
-  {title:"Pattern and Relationship Identification",desc:"Students examine data, cases, or examples to identify patterns, relationships, and contextual factors relevant to a problem.",details:"Ask students to look across multiple examples or data points and identify connections — patterns, causal relationships, contextual factors, or recurring themes.",app:m=>"Provide multiple examples, cases, or data sets and ask students to identify the patterns, relationships, and contextual factors that are relevant to understanding and addressing the problem."},
-  {title:"Structured Debate or Socratic Discussion",desc:"Students examine a complex issue from opposing sides, supporting their analysis with evidence and reasoning.",details:"Assign positions to ensure students must engage analytically with perspectives they may not hold, developing deeper critical thinking.",app:m=>"Organize a structured debate or discussion on a course-relevant question that requires students to analyze the issue from multiple angles, using evidence and reasoning."}
-],
-evaluate: [
-  {title:"Argument Evaluation",desc:"Students assess the quality of an argument — its logic, evidence, assumptions, and conclusions — and render a judgment.",details:"Provide a substantive argument and ask students to evaluate whether the reasoning is sound, the evidence sufficient, and the conclusions warranted.",app:m=>m==='I'?"Give students an argument and ask them to assess the evidence quality and whether the conclusions are supported.":m==='M'?"Give students a complex argument and ask them to evaluate the reasoning, weighing evidence and perspectives to determine whether the conclusions are justified — synthesizing multiple forms of evidence to reach informed conclusions.":"Ask students to evaluate competing arguments on the same issue, weighing the evidence and reasoning to determine which is more convincing and why."},
-  {title:"Solution Evaluation and Recommendation",desc:"Students evaluate multiple proposed solutions to a problem and recommend the strongest one with justification.",details:"Present a problem with several proposed solutions and ask students to evaluate each against criteria — feasibility, evidence base, stakeholder impact, innovation.",app:m=>"Present a discipline-relevant problem with multiple proposed solutions and ask students to evaluate each, then recommend and justify the approach they believe is most effective."},
-  {title:"Peer Critique of Reasoning",desc:"Students evaluate a classmate's problem analysis and provide evidence-based feedback on the quality of their thinking.",details:"This evaluates both the reviewer's ability to identify strong and weak reasoning and the original author's critical thinking. Provide a framework for constructive critique.",app:m=>"Have students review a peer\'s problem analysis and evaluate the quality of reasoning — Are assumptions identified? Is evidence well-used? Are conclusions supported?"},
-  {title:"Critical Reflection on Thinking Process",desc:"Students evaluate their own problem-solving process, assessing what worked, what did not, and what they would change.",details:"Metacognitive evaluation is one of the highest-order critical thinking skills. Ask students to be specific about their reasoning process, not just conclusions.",app:m=>"After a problem-solving exercise, ask students to evaluate their own thinking process — How did they approach it? What perspectives did they consider or miss? What would they do differently?"}
-],
-create: [
-  {title:"Original Problem Analysis and Solution",desc:"Students identify a real problem, analyze it thoroughly, and propose an innovative solution grounded in evidence.",details:"This should require students to independently define a problem, analyze it using credible sources, consider multiple perspectives, and synthesize an original, well-supported solution.",app:m=>"Ask students to identify a genuine problem related to your course content, analyze it using credible sources and multiple perspectives, and propose an innovative solution."},
-  {title:"Integrative Research Project",desc:"Students investigate a complex question, synthesizing evidence from varied sources to draw original conclusions.",details:"The emphasis should be on synthesis and innovation — going beyond summarizing sources to integrate insights across perspectives and generate conclusions reflecting informed thinking.",app:m=>"Assign a research project where students investigate a complex question, synthesizing evidence and perspectives to draw informed, innovative conclusions."},
-  {title:"Creative Solution Prototype",desc:"Students design and develop a prototype, model, or proposal that addresses a real problem in an innovative way.",details:"This captures the creative dimension of this skill. Students should combine ideas in original ways and develop new approaches, not just analyze existing ones.",app:m=>"Have students develop an original solution to a discipline-relevant problem — a prototype, model, proposal, or design — integrating varied perspectives into an innovative approach."},
-  {title:"Critical Thinking Portfolio",desc:"Students compile evidence of their critical and creative thinking development with reflective analysis.",details:"The portfolio should showcase problem identification, evidence analysis, perspective-taking, creative ideation, and solution development — with metacognitive reflection.",app:m=>"Have students assemble a portfolio documenting their growth in critical and creative thinking, with examples and reflective commentary on their development."}
-]
-};
-SA.es3 = {
-remember: [
-  {title:"Data Literacy Fundamentals Check",desc:"Short assessment verifying students can read, identify, and explain quantitative information in various formats.",details:"Assess whether students can extract key information from graphs, tables, equations, and charts and explain what the data shows.",app:m=>"Ask students to interpret data presented in multiple formats and explain in their own words what the data shows and what information can be drawn from it."},
-  {title:"Quantitative Methods Concept Map",desc:"Students map the relationships between quantitative tools, methods, and their appropriate applications.",details:"This helps students see when and why different quantitative approaches are used, rather than viewing them as isolated procedures.",app:m=>"Have students create a concept map connecting different quantitative methods to the types of questions and problems they help address."},
-  {title:"Quantitative Reasoning Reflection",desc:"Students describe how quantitative data appears in their daily lives and their field of study.",details:"Building awareness of how data is used and misused creates a foundation for more sophisticated quantitative reasoning.",app:m=>"Ask students to identify three examples of quantitative data they encounter regularly and explain what information the data provides and what questions it raises."},
-  {title:"Data Display Reading Response",desc:"Students interpret a data display from their discipline and explain the story it tells.",details:"Provide a graph, chart, or table from a discipline-relevant source and ask students to describe the key findings and identify limitations.",app:m=>"Give students a data display from your field and ask them to describe the key information, identify trends or patterns, and note important limitations."}
-],
-apply: [
-  {title:"Applied Data Analysis Exercise",desc:"Students use quantitative methods to work through problems using real or realistic data.",details:"Move beyond textbook problem sets to contextual data. Students should choose methods, carry out analysis, and interpret results.",app:m=>m==='I'?"Provide a structured data set and guide students through applying appropriate quantitative methods with scaffolding.":m==='M'?"Present complex real-world data requiring students to select from multiple possible methods, conduct analysis, and produce well-reasoned conclusions.":"Give students contextual data and ask them to independently select and apply appropriate quantitative methods, then interpret results."},
-  {title:"Data Visualization Creation",desc:"Students represent quantitative information using appropriate visual formats.",details:"Assess not just accuracy but appropriateness — did they choose the right display type? Does the visualization communicate clearly and honestly?",app:m=>"Ask students to take a data set and create an appropriate visual representation that clearly and accurately communicates the key quantitative findings."},
-  {title:"Statistical Description Task",desc:"Students apply statistical measures to describe and summarize a data set in context.",details:"Students should calculate and interpret measures and explain what the numbers mean in context, not just perform calculations.",app:m=>"Provide contextual data and ask students to apply percentages, statistics, or other quantitative measures and explain what the numbers mean in context."},
-  {title:"Quantitative Problem-Solving Scenario",desc:"Students apply quantitative strategies to solve a problem grounded in a realistic situation.",details:"Provide a scenario where quantitative reasoning is needed to make a decision. Assess whether students can identify needed data, select an approach, and reach a supported conclusion.",app:m=>"Present a realistic scenario from your discipline that requires quantitative reasoning, and ask students to identify relevant data, select a method, and work through to a supported conclusion."}
-],
-analyze: [
-  {title:"Real-World Data Analysis",desc:"Students analyze authentic data from their discipline using appropriate strategies.",details:"Provide real data sets and ask students to go beyond description to identify patterns, relationships, and meaning in context.",app:m=>"Give students a real-world data set from your discipline and ask them to analyze it — identifying patterns, relationships, and anomalies — and explain what the data reveals."},
-  {title:"Statistical Claims Analysis",desc:"Students examine how statistics are used in arguments and differentiate between appropriate and misleading uses.",details:"Provide examples where statistics support arguments — some appropriate, some misleading — and ask students to analyze the difference.",app:m=>"Give students examples of statistical claims and ask them to analyze whether the statistics are used appropriately, identifying misrepresentation, missing context, or misleading presentations."},
-  {title:"Methodology Comparison",desc:"Students compare different quantitative approaches to the same question and analyze the trade-offs.",details:"Present a question addressable by different methods and ask students to analyze the strengths, limitations, and assumptions of each.",app:m=>"Present a research question and ask students to compare two quantitative approaches, analyzing the strengths, weaknesses, and assumptions of each method."},
-  {title:"Data-Driven Case Study Analysis",desc:"Students analyze a case study that requires interpreting quantitative evidence to understand a complex situation.",details:"Use a case where quantitative data is central. Students should analyze the data, identify what it tells them, and explain the implications.",app:m=>"Present a case study where quantitative data is key and ask students to analyze the data, identify patterns, and explain what the evidence reveals about the problem."}
-],
-evaluate: [
-  {title:"Critique of Data-Based Arguments",desc:"Students evaluate the quality of quantitative reasoning in a published argument, report, or study.",details:"Provide a source using data to support conclusions and ask students to evaluate whether the data supports the claims.",app:m=>"Give students a report or article that uses quantitative data and ask them to evaluate the reasoning — Does the data support the conclusions? Are the methods appropriate?"},
-  {title:"Evidence-Based Quantitative Recommendation",desc:"Students assess a situation using data and recommend a course of action with quantitative justification.",details:"Present a decision scenario with available data and ask students to weigh evidence, consider limitations, and produce a justified recommendation.",app:m=>m==='I'?"Present a scenario requiring a data-informed decision and ask students to evaluate the evidence and recommend an action with justification.":m==='M'?"Present a complex real-world scenario and ask students to analyze available data, evaluate the quantitative evidence, and produce a well-reasoned, data-informed recommendation.":"Present a more complex scenario with competing data sources and ask students to weigh the evidence and recommend a course of action, addressing limitations."},
-  {title:"Quantitative Methods Evaluation",desc:"Students assess the appropriateness of quantitative methods used in a study or project.",details:"Ask students to evaluate the design and execution — Was the right method used? Was data sufficient? Were conclusions justified?",app:m=>"Give students a research study and ask them to evaluate whether the quantitative methods were appropriate, the data sufficient, and the conclusions warranted."},
-  {title:"Peer Review of Data Analysis",desc:"Students evaluate a classmate's quantitative analysis and provide feedback on accuracy, methods, and interpretation.",details:"This builds both the reviewer's ability to assess quantitative work and their understanding of quality quantitative reasoning.",app:m=>"Have students review a peer\'s data analysis and evaluate accuracy, method choice, and interpretation quality using structured criteria."}
-],
-create: [
-  {title:"Original Data Analysis Project",desc:"Students design and conduct their own quantitative analysis of a real-world question.",details:"Students should formulate a question, identify appropriate data, choose and apply methods, and present findings with interpretation.",app:m=>"Assign a project where students formulate a quantitative question, identify or collect data, conduct analysis, and present well-reasoned, data-informed conclusions."},
-  {title:"Data-Informed Proposal",desc:"Students develop a proposal or plan grounded in quantitative evidence and data-supported reasoning.",details:"The data should drive the argument, not decorate it. This could be a business proposal, policy recommendation, or resource allocation plan.",app:m=>"Ask students to develop a proposal for your discipline that is explicitly grounded in quantitative evidence — where data analysis is central to the argument and recommendations."},
-  {title:"Quantitative Reasoning Portfolio",desc:"Students compile evidence of their development in using data and quantitative methods with reflective analysis.",details:"Show progression from basic data reading to sophisticated analysis. Reflection should demonstrate self-assessment of quantitative reasoning abilities.",app:m=>"Have students compile a portfolio showcasing growth in quantitative reasoning with reflective commentary on their development."},
-  {title:"Professional Data Presentation",desc:"Students create and deliver a data-driven presentation communicating quantitative findings to a professional audience.",details:"Assess ability to translate complex quantitative information into clear, accurate, and persuasive communication.",app:m=>"Ask students to present quantitative findings to a professional audience, demonstrating ability to communicate data clearly, choose appropriate visualizations, and draw well-reasoned conclusions."}
-]
-};
-SA.es4 = {
-remember: [
-  {title:"Interpersonal Awareness Reflection",desc:"Students describe their own interaction patterns and how their perspectives shape relationships.",details:"Self-awareness is the foundation. Provide structured prompts that help students examine their habits, tendencies, and assumptions in interpersonal contexts.",app:m=>"Ask students to reflect on how their own perspectives and experiences shape the way they interact with others — what assumptions they tend to make and how those might affect their relationships."},
-  {title:"Interaction Principles Identification",desc:"Students identify and explain key principles of effective interpersonal interaction.",details:"Assess whether students can recognize what makes interactions productive — active listening, perspective awareness, respectful disagreement, empathy.",app:m=>"Have students identify and explain the principles that contribute to positive, effective interactions — and describe why self-awareness and perspective-taking matter."},
-  {title:"Perspectives and Beliefs Exploration",desc:"Students describe multiple perspectives on an issue, demonstrating awareness that people hold different ideas and beliefs.",details:"This asks students to recognize that others experience the world differently — a prerequisite for more active perspective-taking at higher levels.",app:m=>"Present a scenario or issue and ask students to describe the different perspectives people might hold, explaining where those perspectives come from and how they differ."},
-  {title:"Interpersonal Dynamics Reading Response",desc:"Students engage with a text about interpersonal communication and identify strategies for effective interaction.",details:"Provide a reading on communication, perspective-taking, or interpersonal dynamics and ask students to identify and explain the strategies described.",app:m=>"Assign a reading about effective interpersonal interaction and ask students to identify the key strategies, explaining how each contributes to building positive relationships."}
-],
-apply: [
-  {title:"Active Listening and Perspective-Taking Exercise",desc:"Students practice listening to understand and demonstrate they can accurately represent another person's viewpoint.",details:"Pair students for a structured exercise where they must listen, paraphrase, and confirm accuracy before sharing their own perspective.",app:m=>m==='I'?"Set up a structured paired exercise where students practice active listening and perspective-taking with guiding prompts to help them focus on understanding their partner\'s viewpoint.":m==='M'?"Have students facilitate a conversation between peers with different perspectives, demonstrating sophisticated active listening and the ability to bridge differences.":"Facilitate a perspective-taking exercise where students must accurately represent viewpoints different from their own, demonstrating they can identify multiple perspectives through genuine interaction."},
-  {title:"Interpersonal Scenario Response",desc:"Students apply interpersonal skills to navigate a realistic social or professional scenario.",details:"Present a situation involving interpersonal complexity and ask students to describe how they would respond and why.",app:m=>"Present an interpersonal scenario relevant to your discipline and ask students to describe how they would navigate it — what strategies they would use to listen, understand the other person, and communicate respectfully."},
-  {title:"Cross-Perspective Dialogue",desc:"Students engage in a structured conversation with someone who holds a different perspective, practicing respectful exchange.",details:"Create a format ensuring both parties practice genuine listening and respectful engagement rather than debate.",app:m=>"Facilitate a structured dialogue where students engage with someone holding a different perspective, assessing their ability to listen, respond respectfully, and demonstrate understanding."},
-  {title:"Self-Awareness Application",desc:"Students identify how their own perspectives influence a current interaction and adjust their approach.",details:"This moves self-awareness from abstract reflection to real-time application during group work.",app:m=>"During a collaborative activity, ask students to reflect on how their perspectives are shaping the interaction, identify one adjustment they can make, and practice it."}
-],
-analyze: [
-  {title:"Interpersonal Interaction Analysis",desc:"Students analyze a real or simulated interpersonal exchange, examining how perspectives and communication patterns influenced the outcome.",details:"Provide a detailed interaction scenario and ask students to analyze why it played out the way it did — what interpersonal dynamics were at play.",app:m=>"Give students a detailed interpersonal exchange and ask them to analyze the perspectives, assumptions, and communication patterns at play — explaining how self-awareness influenced the outcome."},
-  {title:"Perspective Impact Comparison",desc:"Students compare how different personal perspectives lead to different interpretations of the same situation.",details:"Present a situation and ask students to analyze it from multiple viewpoints, comparing how different experiences lead to different understandings.",app:m=>"Present an interpersonal scenario and ask students to analyze how different people\'s perspectives and experiences would lead them to interpret and respond to the situation differently."},
-  {title:"Structured Discussion on Interpersonal Dynamics",desc:"Students examine an interpersonal issue from multiple sides through facilitated discussion.",details:"Choose an interpersonal topic with genuine complexity and facilitate discussion requiring analytical depth, not just opinion sharing.",app:m=>"Facilitate a structured discussion around an interpersonal question relevant to your discipline — one that requires students to analyze underlying dynamics, not just share personal opinions."},
-  {title:"Communication Pattern Analysis",desc:"Students examine patterns in how people interact in a specific context, identifying what supports and what undermines effective relationships.",details:"Ask students to observe or review interactions and analyze the communication patterns — What promotes positive interaction? What creates barriers?",app:m=>"Have students analyze communication and interaction patterns in a specific context, identifying which patterns support effective interaction and which create barriers."}
-],
-evaluate: [
-  {title:"Interpersonal Effectiveness Assessment",desc:"Students evaluate the quality of an interpersonal interaction using criteria for self-awareness, perspective-taking, and respectful engagement.",details:"Provide an interaction to assess and criteria focused on the specific behaviors the rubric identifies. Students should justify their evaluation with evidence.",app:m=>m==='I'?"Have students evaluate an interpersonal exchange using provided criteria focused on listening, perspective-taking, and respectful communication.":m==='M'?"Have students evaluate a complex interpersonal situation, assessing effectiveness and recommending improvements — demonstrating sophisticated self-awareness and the ability to bridge differences.":"Have students evaluate an interpersonal interaction with increasing sophistication, assessing both the behaviors observed and the underlying dynamics that shaped the exchange."},
-  {title:"Structured Peer Feedback on Interpersonal Skills",desc:"Students give and receive constructive feedback on their interpersonal behaviors during a collaborative exercise.",details:"The act of giving thoughtful, respectful feedback is itself a demonstration of interpersonal skill. Provide a framework focused on observable behaviors.",app:m=>"After a collaborative exercise, have students give and receive structured peer feedback on specific interpersonal behaviors. The quality of the feedback itself demonstrates interpersonal skill."},
-  {title:"Self-Evaluation of Interpersonal Growth",desc:"Students honestly assess their development in self-awareness, perspective-taking, and interpersonal effectiveness.",details:"The quality of the self-evaluation reveals the student's actual level of self-awareness. Provide prompts that push beyond surface-level reflection.",app:m=>"Ask students to evaluate their own growth in interpersonal skills — How has their self-awareness developed? How effectively do they engage with people who hold different perspectives?"},
-  {title:"Interaction Strategy Recommendation",desc:"Students assess an interpersonal challenge and recommend an approach for improvement.",details:"Present a scenario with tension or miscommunication and ask students to evaluate what is happening and recommend specific strategies.",app:m=>"Present an interpersonal challenge from your discipline and ask students to evaluate the dynamics, identify what is undermining the interaction, and recommend strategies for improvement."}
-],
-create: [
-  {title:"Interpersonal Skills Workshop or Resource",desc:"Students create a practical resource for building effective interpersonal skills in a context relevant to their discipline.",details:"This could be a training module, facilitation guide, or workshop plan. The product demonstrates understanding of effective interaction.",app:m=>"Have students design a resource for improving interpersonal effectiveness in their field — demonstrating mastery of self-awareness, perspective-taking, and respectful communication principles."},
-  {title:"Reflective Interpersonal Portfolio",desc:"Students compile evidence of their interpersonal skill development with thoughtful analysis.",details:"Include reflections on interactions, peer feedback, self-assessments, and examples of perspective-taking.",app:m=>"Have students compile a portfolio documenting their interpersonal skill development — with reflective analysis of their growth in self-awareness, perspective-taking, and relationship-building."},
-  {title:"Facilitated Cross-Perspective Dialogue",desc:"Students design and lead a structured conversation bringing together people with different perspectives.",details:"This capstone task requires applying self-awareness, active listening, perspective-taking, and respectful communication simultaneously in real-time facilitation.",app:m=>"Ask students to design and facilitate a structured dialogue bringing together different perspectives, demonstrating the ability to create conditions for positive interaction and bridge differences."},
-  {title:"Interpersonal Dynamics Case Analysis",desc:"Students produce an original, in-depth analysis of interpersonal dynamics in a professional or community context.",details:"This should demonstrate the student can apply interpersonal concepts to real situations — analyzing why interactions unfolded as they did and proposing improvements.",app:m=>"Have students produce a professional-quality analysis of interpersonal dynamics in a setting relevant to their field — examining how perspectives and communication shaped outcomes and proposing improvements."}
-]
-};
-SA.es5 = {
-remember: [
-  {title:"Adaptability and Leadership Concepts",desc:"Students identify and explain key principles of effective leadership and adaptive behavior.",details:"Assess whether students can describe concepts like growth mindset, change management, motivation, coaching, and resilience.",app:m=>"Ask students to describe key concepts related to adaptability and leadership and explain why these matter in professional settings."},
-  {title:"Leadership and Change Concept Map",desc:"Students map the relationships between adaptability, goal-setting, motivation, and coaching.",details:"Help students see how these concepts connect — how adaptability supports goals, how leadership involves motivating and coaching.",app:m=>"Have students create a concept map showing how adaptability, goal-setting, motivating others, and coaching relate to one another during change."},
-  {title:"Personal Change Experience Reflection",desc:"Students describe a personal experience navigating change and identify what helped or hindered their response.",details:"This builds self-awareness about adaptive behavior. Ask students to be specific about strategies used and lessons learned.",app:m=>"Ask students to describe a time they navigated significant change and reflect on what helped them adapt — what strategies or support made a difference."},
-  {title:"Leadership in Action Reading Response",desc:"Students read about a leader navigating change and identify the specific adaptive strategies demonstrated.",details:"Provide a case study or article and ask students to identify not just what the leader did, but why those behaviors were effective.",app:m=>"Assign a reading about leadership during change and ask students to identify the strategies used to adapt, motivate others, and overcome obstacles."}
-],
-apply: [
-  {title:"Change Response Scenario",desc:"Students apply adaptability strategies to a scenario involving unexpected change.",details:"Present a realistic situation where plans must shift and ask students to develop a response demonstrating adaptive thinking.",app:m=>m==='I'?"Present a change scenario with guiding questions to help students practice adaptive strategies — adjusting plans, maintaining a positive approach, and considering how to support others.":m==='M'?"Present a complex change scenario requiring students to overcome barriers, model new strategies, and provide guidance to others navigating the transition.":"Present a change scenario with less scaffolding, asking students to independently develop a response and encourage others through the transition."},
-  {title:"Team Goal-Setting and Motivation Exercise",desc:"Students practice setting shared goals and motivating peers during a structured team activity.",details:"Design an activity requiring collaborative goal-setting. Assess not just goal achievement but how students motivate and support one another.",app:m=>"Assign a team activity requiring students to set a shared goal and work toward it, assessing whether they contribute effectively, encourage persistence, and support others."},
-  {title:"Adaptive Problem-Solving Simulation",desc:"Students work through a task where conditions change midway, requiring them to adjust their approach.",details:"Introduce a planned shift partway through. Assess how students respond — do they resist or adapt? Do they help others adjust?",app:m=>"Design an exercise where conditions shift during the task and assess how students adjust their approach and support their peers through the transition."},
-  {title:"Coaching and Encouragement Practice",desc:"Students practice encouraging and coaching a peer through a challenging task.",details:"Pair students so one works through a difficulty while the other practices coaching — offering encouragement, asking guiding questions, helping their partner persist.",app:m=>"Set up a paired exercise where one student practices coaching another through a challenge, assessing whether they can motivate, guide, and encourage effectively."}
-],
-analyze: [
-  {title:"Leadership Response Comparison",desc:"Students compare two leadership approaches to change and analyze what made one more effective.",details:"Use case studies or contrasting scenarios. Ask students to analyze why certain strategies and behaviors led to better outcomes.",app:m=>"Present two examples of leaders navigating change and ask students to compare their approaches — analyzing which strategies were effective and how context shaped outcomes."},
-  {title:"Change Dynamics Case Study",desc:"Students analyze a detailed case of a team or organization navigating significant change.",details:"Provide enough detail that students can trace the process — identifying barriers, strategies, decisions, and consequences.",app:m=>"Give students a case study of a team navigating major change and ask them to analyze the leadership decisions, adaptive strategies, and group dynamics."},
-  {title:"Motivation and Resistance Analysis",desc:"Students examine why people respond differently to change and what drives motivation or resistance.",details:"This develops understanding of the human dynamics of change — different people respond differently depending on circumstances, values, and experiences.",app:m=>"Present a change scenario and ask students to analyze why different people might respond differently — examining what drives motivation and resistance and what a leader could do."},
-  {title:"Adaptive Strategy Analysis",desc:"Students analyze a challenging situation and identify which adaptive strategies would be most effective and why.",details:"Provide a complex scenario with multiple possible responses and ask students to analyze the situation and match strategies to challenges.",app:m=>"Present a complex change scenario and ask students to analyze the situation, identify which adaptive and leadership strategies would be most effective, and explain their reasoning."}
-],
-evaluate: [
-  {title:"Leadership Effectiveness Evaluation",desc:"Students evaluate a leader's effectiveness in navigating change using defined criteria.",details:"Provide criteria focused on adaptability, goal achievement, motivation, and coaching. Students should support evaluation with specific evidence.",app:m=>m==='I'?"Have students evaluate a leader\'s response to change using provided criteria focused on adaptability, motivation, and support of others.":m==='M'?"Have students evaluate a complex leadership situation, assessing how the leader anticipated change, modeled strategies, and coached others — demonstrating sophisticated judgment about adaptive leadership.":"Have students evaluate leadership effectiveness with increasing sophistication, assessing not just behaviors but the reasoning and adaptability behind decisions."},
-  {title:"Change Strategy Recommendation",desc:"Students assess a change situation and recommend a leadership approach with justification.",details:"Present a scenario where a group is struggling with change and ask students to evaluate the situation and recommend a strategy.",app:m=>"Present a scenario where a group is struggling to adapt and ask students to evaluate what is happening, consider approaches, and recommend a leadership strategy for guiding the group through change."},
-  {title:"Peer Feedback on Leadership Behaviors",desc:"Students evaluate a classmate's adaptive leadership during a team exercise.",details:"The act of evaluating leadership requires understanding what effective leadership looks like. Provide criteria focused on adaptability, motivation, and coaching.",app:m=>"After a team exercise, have students evaluate a peer\'s adaptive leadership behaviors using structured criteria — Did they help the team adjust? Encourage persistence? Support others?"},
-  {title:"Self-Assessment of Adaptive Leadership",desc:"Students evaluate their own growth in responding to change and supporting others.",details:"Ask for evidence — specific examples of adapting, motivating others, or helping a team navigate challenges — rather than general self-ratings.",app:m=>"Ask students to evaluate their development as adaptive leaders, providing specific examples of navigating change, supporting others, and growing in their ability to lead through uncertainty."}
-],
-create: [
-  {title:"Change Management Plan",desc:"Students design a comprehensive plan for leading through a significant change.",details:"The plan should demonstrate anticipation of challenges, adaptive strategies, and approaches for motivating and coaching others.",app:m=>"Have students develop a change management plan for a realistic scenario including anticipated barriers, adaptive strategies, and approaches for motivating and coaching others."},
-  {title:"Adaptive Leadership Portfolio",desc:"Students compile evidence of their leadership and adaptability development with reflective analysis.",details:"Include examples of navigating change, motivating or coaching others, and adapting when things did not go as planned.",app:m=>"Have students compile a portfolio documenting their development as adaptive leaders with reflective commentary on their growth."},
-  {title:"Culminating Leadership Experience",desc:"Students lead a team through a complex, authentic challenge requiring genuine adaptability.",details:"The experience should involve real uncertainty, changing conditions, and the need to support others.",app:m=>"Design a culminating experience where students lead a group through a complex challenge — overcoming barriers, modeling new strategies, and coaching others."},
-  {title:"Leadership Development Resource",desc:"Students create a resource for helping others develop adaptive leadership skills.",details:"The quality reveals their own understanding — a well-designed resource demonstrates mastery of adaptive leadership concepts.",app:m=>"Ask students to design a workshop, training module, or guide for developing adaptive leadership skills in their field."}
-]
-};
-SA.es6 = {
-remember: [
-  {title:"Professional Standards Identification",desc:"Students identify and explain key elements of professional behavior relevant to their field.",details:"Assess whether students can describe ethics, accountability, time management, initiative, and field-specific knowledge and explain why each matters.",app:m=>"Ask students to identify the key components of professional behavior in their field and explain why ethics, accountability, time management, and initiative matter."},
-  {title:"Professional Ethics Concept Map",desc:"Students map the relationships between ethical principles, codes of conduct, and workplace behavior.",details:"Help students see how abstract ethical principles translate into concrete professional expectations.",app:m=>"Have students create a concept map connecting ethical principles, professional codes of conduct, accountability, and initiative in their field."},
-  {title:"Professional Identity Reflection",desc:"Students reflect on what professionalism means in their intended career and how their current habits align.",details:"Build awareness of professional expectations. Ask for honest self-assessment, not idealized descriptions.",app:m=>"Ask students to describe what professionalism looks like in their intended career and honestly assess how their current habits compare."},
-  {title:"Code of Ethics Reading Response",desc:"Students read a professional code of ethics and identify key standards and expectations.",details:"Provide the actual code from the relevant professional organization. Ask students to identify and explain standards, not just list them.",app:m=>"Assign a professional code of ethics from your field and ask students to identify key standards, explain the reasoning behind them, and describe what following them looks like in practice."}
-],
-apply: [
-  {title:"Ethical Decision-Making Scenario",desc:"Students apply professional ethical principles to navigate a realistic workplace dilemma.",details:"Present a scenario with genuine ethical tension. Assess reasoning process and application of principles, not just the answer.",app:m=>m==='I'?"Present an ethical scenario with guiding questions to help students practice identifying what is at stake and what professional principles apply.":m==='M'?"Present a complex ethical situation requiring students to model ethical behavior, balancing competing obligations with professional judgment.":"Present an ethical dilemma and ask students to independently determine the appropriate response, explaining which principles guided their decision."},
-  {title:"Project Management and Accountability Task",desc:"Students manage a multi-step assignment demonstrating organization, time management, and reliability.",details:"Design an assignment with interim deliverables. Assess professional behaviors alongside content quality.",app:m=>"Assign a multi-step project with interim deadlines and assess both the quality of the work and the professional behaviors — meeting deadlines, managing time, and taking accountability."},
-  {title:"Field-Specific Professional Communication",desc:"Students practice using the professional language and tools of their discipline.",details:"Give students a task requiring appropriate terminology and professional tools. This builds professional fluency.",app:m=>"Design a task where students must use field-specific terminology and professional tools appropriately — demonstrating they can operate within the standards of their discipline."},
-  {title:"Professional Conduct Simulation",desc:"Students practice professional behavior in a simulated workplace or clinical scenario.",details:"Create a realistic scenario and assess expected behaviors — preparation, appropriate communication, ethical conduct, accountability.",app:m=>"Simulate a professional situation and assess students\' behavior — Are they prepared? Professional in communication? Handling feedback constructively?"}
-],
-analyze: [
-  {title:"Professional Ethics Case Study",desc:"Students analyze an ethical dilemma from their field, examining competing obligations and perspectives.",details:"Use a case with genuine complexity. Ask students to analyze the situation, not just choose a side.",app:m=>"Present an ethical case study from your field and ask students to analyze the competing obligations, perspectives, and professional standards at play."},
-  {title:"Professional Standards Comparison",desc:"Students compare professional expectations across different contexts and analyze the differences.",details:"Compare codes, cultures, or approaches to the same professional issue. The goal is analytical depth.",app:m=>"Have students compare professional expectations across two contexts in your discipline and analyze what accounts for the differences and what the implications are."},
-  {title:"Accountability and Feedback Analysis",desc:"Students examine how accountability systems and feedback processes function in a professional context.",details:"Ask students to analyze how professionals handle mistakes, receive feedback, and maintain accountability.",app:m=>"Present a scenario involving professional accountability and ask students to analyze how feedback was given and received and what factors supported or hindered professional growth."},
-  {title:"Industry Standards Examination",desc:"Students analyze current industry standards and best practices, examining how they shape professional behavior.",details:"Use current industry publications or standards documents. Build awareness of how expectations evolve.",app:m=>"Ask students to research and analyze current industry standards in their field, examining how these standards shape day-to-day professional behavior."}
-],
-evaluate: [
-  {title:"Professional Work Evaluation",desc:"Students evaluate professional work against field-specific standards.",details:"At higher levels, students should help develop evaluation criteria themselves.",app:m=>m==='I'?"Have students evaluate a professional work product using provided criteria for quality, ethical integrity, and adherence to professional standards.":m==='M'?"Have students evaluate professional work against industry standards using criteria they help develop, modeling the professional judgment expected of practitioners.":"Have students evaluate professional work with increasing independence in applying standards and providing specific, actionable assessment."},
-  {title:"Ethical Reasoning Position Paper",desc:"Students take and defend a position on a professional ethics question.",details:"The question should involve genuine ethical tension. Students should reason through competing obligations.",app:m=>"Assign a paper where students take and defend a position on an ethical question relevant to your discipline, demonstrating sophisticated ethical reasoning."},
-  {title:"Self-Assessment of Professional Development",desc:"Students evaluate their own professional growth using evidence and specific examples.",details:"Assess development in ethics, accountability, time management, and initiative with concrete evidence.",app:m=>"Ask students to evaluate their professional development, providing specific evidence of growth in accountability, ethical decision-making, initiative, and professional communication."},
-  {title:"Professional Improvement Recommendation",desc:"Students assess a professional situation and recommend improvements grounded in ethics and best practices.",details:"Present a scenario where standards are being met unevenly and ask students to evaluate and recommend improvements.",app:m=>"Present a professional scenario with room for improvement and ask students to evaluate what is working and what is not, recommending changes grounded in professional standards."}
-],
-create: [
-  {title:"Professional Development Plan",desc:"Students create a detailed plan for continued professional growth.",details:"Address ethics, skill development, industry awareness, and networking. Demonstrate proactive career planning.",app:m=>"Have students develop a professional development plan including goals for ethical growth, skill advancement, staying current with industry standards, and taking initiative."},
-  {title:"Professional Practice Portfolio",desc:"Students compile evidence of professional development with reflective analysis.",details:"Document ethical decision-making, accountability, time management, initiative, and professional communication.",app:m=>"Have students compile a portfolio documenting their professional development with reflective commentary analyzing their growth as a professional."},
-  {title:"Professional Capstone Deliverable",desc:"Students complete a substantial professional task to industry standards.",details:"Require independent management of a professional-quality deliverable from planning through execution.",app:m=>"Design a culminating experience where students produce a professional-quality deliverable meeting industry standards — demonstrating ethical integrity, initiative, accountability, and current knowledge."},
-  {title:"Professional Standards Guide",desc:"Students create a resource articulating professional expectations for newcomers to their field.",details:"Creating a resource for others requires deep understanding of professionalism in the field.",app:m=>"Ask students to create a professional standards guide for newcomers to their field, demonstrating understanding of ethical expectations, accountability norms, and professional practices."}
-]
-};
-SA.es7 = {
-remember: [
-  {title:"Civic Engagement Concepts",desc:"Students identify and explain key principles of civic participation and its impact on society.",details:"Assess whether students can describe democratic principles, the role of civic participation, and how engagement affects public policy.",app:m=>"Ask students to describe key principles of civic engagement — including how individual and community involvement in political, social, and other activities can benefit society."},
-  {title:"Civic Participation Concept Map",desc:"Students map the relationships between democratic principles, civic action, public policy, and community impact.",details:"Help students visualize how civic engagement works as a system — from participation to policy change to societal impact.",app:m=>"Have students create a concept map showing how individual civic participation connects to community action, public policy, and positive social change."},
-  {title:"Civic Experience Reflection",desc:"Students describe their own civic experiences and beliefs about community engagement.",details:"Build awareness of students' relationship to civic life — whether they have engaged, why or why not, and what issues matter to them.",app:m=>"Ask students to reflect on their own civic experiences and describe what political, social, or community issues matter to them and why."},
-  {title:"Civic Issues Reading Response",desc:"Students engage with a text about a public policy issue and identify key arguments and perspectives.",details:"Provide a reading about a current issue and ask students to identify arguments, perspectives, and potential impact.",app:m=>"Assign a reading about a public policy issue or civic initiative and ask students to identify the key arguments, perspectives, and how civic engagement could address it."}
-],
-apply: [
-  {title:"Civic Dialogue Exercise",desc:"Students practice engaging with others who hold different perspectives on a public policy or social issue.",details:"Create a structured format for respectful civic dialogue where students must listen and respond, not just wait to speak.",app:m=>m==='I'?"Facilitate a structured civic dialogue where students practice discussing a public policy issue respectfully, expressing views while acknowledging different perspectives.":m==='M'?"Have students facilitate civic dialogue themselves, managing conversations across different perspectives to build shared understanding and identify potential actions.":"Facilitate civic dialogue with less scaffolding, expecting students to engage independently through active listening, responsive dialogue, and collaboration."},
-  {title:"Civic Action Planning",desc:"Students develop a plan for addressing a civic issue, connecting knowledge of democratic processes to potential action.",details:"Students should identify an issue, consider who is affected, and plan specific actions leveraging civic participation.",app:m=>"Ask students to identify a civic issue and develop a plan connecting their understanding of civic participation and public policy to concrete action steps."},
-  {title:"Persuasive Civic Writing",desc:"Students write a persuasive piece about a social or political issue, supported by evidence and reflection.",details:"Assess whether students can construct well-reasoned civic arguments incorporating reflection, evidence, and community awareness.",app:m=>"Ask students to write a persuasive argument on a civic issue, drawing on reflection, analysis, and evidence to argue for action that would benefit society."},
-  {title:"Community Issue Investigation",desc:"Students investigate a real civic issue in their community and report on stakeholders and perspectives.",details:"This moves civic engagement from abstract to concrete. Students should investigate a real issue and apply their understanding.",app:m=>"Have students investigate a real civic issue in their community — identifying stakeholders, perspectives, and how civic participation could help address it."}
-],
-analyze: [
-  {title:"Public Policy Analysis",desc:"Students analyze a public policy issue, examining multiple stakeholder perspectives and potential impacts.",details:"Choose a policy issue with genuine complexity and ask students to analyze — not just describe — competing needs and perspectives.",app:m=>"Present a public policy issue and ask students to analyze the perspectives of different stakeholders, examining how different values and experiences lead to different positions."},
-  {title:"Civic Action Effectiveness Analysis",desc:"Students analyze a civic initiative or social movement, examining strategies and effectiveness.",details:"Use a real example and ask students to analyze strategies, levers for change, and what made the effort effective or ineffective.",app:m=>"Have students analyze a civic initiative or social movement, examining the strategies used, the levers for change targeted, and what factors influenced the outcome."},
-  {title:"Structured Civic Debate",desc:"Students examine a civic issue from opposing sides with evidence-based arguments.",details:"Assign positions to ensure analytical engagement with perspectives students may not hold. Require evidence.",app:m=>"Organize a structured debate on a public policy issue, requiring students to engage with multiple perspectives and support their analysis with evidence and awareness of community impact."},
-  {title:"Comparative Civic Engagement Analysis",desc:"Students compare approaches to civic engagement across different contexts.",details:"Compare strategies across communities, time periods, or issue areas. Ask students to analyze what makes each effective.",app:m=>"Have students compare civic engagement approaches in two different contexts and analyze what contextual factors made each approach more or less effective."}
-],
-evaluate: [
-  {title:"Civic Initiative Evaluation",desc:"Students evaluate a civic initiative or proposed policy and assess its potential for positive community impact.",details:"Provide a real initiative and ask students to evaluate likelihood of success, consequences, and whether it addresses community needs.",app:m=>m==='I'?"Have students evaluate a civic initiative, assessing its potential impact and whether it addresses the needs of those affected.":m==='M'?"Have students evaluate a civic initiative\'s effectiveness, assessing whether it targets appropriate levers for change and addresses multiple stakeholder needs.":"Have students evaluate a civic initiative with greater sophistication, assessing both the strategies used and the perspectives of multiple stakeholders."},
-  {title:"Civic Engagement Position Paper",desc:"Students take and defend a position on a civic issue with evidence and community awareness.",details:"Go beyond personal opinion to make a well-reasoned case incorporating evidence and awareness of diverse community needs.",app:m=>"Assign a paper where students take and defend a position on a civic issue, integrating evidence, reflection, and analysis of how the issue affects different communities."},
-  {title:"Community Needs Assessment Evaluation",desc:"Students evaluate community needs data and prioritize civic action.",details:"Provide community data and ask students to evaluate which needs are most pressing and which could be addressed through civic action.",app:m=>"Give students community needs data and ask them to evaluate the findings, prioritize needs, and assess which issues could most effectively be addressed through civic engagement."},
-  {title:"Civic Communication Critique",desc:"Students evaluate the effectiveness of a persuasive civic communication.",details:"Provide an advocacy piece, policy brief, or public campaign and ask students to evaluate its effectiveness.",app:m=>"Give students a persuasive civic communication and ask them to evaluate its effectiveness in building support for meaningful civic action."}
-],
-create: [
-  {title:"Civic Action Project",desc:"Students design and implement a civic engagement project addressing a real community need.",details:"The project should engage stakeholders, target appropriate levers for change, and require communication across audiences.",app:m=>"Have students design and implement a civic action project that addresses a real community need — engaging stakeholders, targeting levers for change, and communicating across audiences."},
-  {title:"Civic Engagement Portfolio",desc:"Students compile evidence of their civic engagement and growth.",details:"Include dialogue, civic action, persuasive communication, and reflection on civic development.",app:m=>"Have students compile a portfolio documenting their civic engagement with reflective analysis of their growth as an engaged citizen."},
-  {title:"Tailored Civic Communication Campaign",desc:"Students create civic communications targeted at multiple audiences to build support for action.",details:"Require students to adapt their message to different audiences, considering needs, interests, and potential contributions.",app:m=>"Ask students to create civic communications targeting different audiences — tailoring their message to build support for a specific civic action."},
-  {title:"Community Stakeholder Engagement Plan",desc:"Students develop a plan for engaging community stakeholders in collaborative civic action.",details:"Identify key stakeholders, assess needs and perspectives, and propose engagement strategies.",app:m=>"Have students develop a stakeholder engagement plan for a civic initiative — identifying stakeholders, assessing perspectives, and proposing strategies for collaborative civic action."}
-]
-};
-SA.es8 = {
-remember: [
-  {title:"Teamwork Principles Identification",desc:"Students identify and explain key principles of effective team collaboration.",details:"Assess whether students can describe shared goals, clear roles, communication, conflict management, trust, and accountability.",app:m=>"Ask students to identify key principles of effective teamwork and explain why shared goals, clear roles, conflict management, and accountability matter."},
-  {title:"Team Dynamics Concept Map",desc:"Students map how components of effective teamwork relate to and depend on one another.",details:"Help students see teamwork as a system of interconnected behaviors rather than a checklist.",app:m=>"Have students create a concept map showing how shared goals, role distribution, communication, trust, feedback, and conflict management support team performance."},
-  {title:"Team Experience Reflection",desc:"Students describe a past team experience and identify what contributed to or hindered effectiveness.",details:"Build self-awareness about collaborative patterns. Ask students to reflect on their own role and contributions.",app:m=>"Ask students to reflect on a team experience — What made the collaboration effective or ineffective? What role did they play? How did their contributions impact the team?"},
-  {title:"Collaboration Strategies Reading Response",desc:"Students engage with a text about team dynamics and identify strategies for effective collaboration.",details:"Provide a reading on teamwork or conflict management and ask students to identify and explain strategies.",app:m=>"Assign a reading on team dynamics and ask students to identify key strategies for effective teamwork, explaining how each contributes to achieving team goals."}
-],
-apply: [
-  {title:"Structured Team Problem-Solving",desc:"Students work through a problem as a team, practicing role distribution, communication, and shared accountability.",details:"Design an exercise requiring genuine interdependence — the problem cannot be solved by individuals in parallel.",app:m=>m==='I'?"Assign a team exercise with clear role assignments and structured checkpoints, providing guidance on task distribution and communication.":m==='M'?"Assign a complex team challenge requiring students to collaborate across multiple perspectives, advocating for evidence-based solutions while integrating team members\' strengths.":"Assign a team exercise where students independently distribute roles, manage tasks, and communicate — practicing identification of tasks and leveraging team members\' strengths."},
-  {title:"Constructive Conflict Resolution Practice",desc:"Students practice addressing disagreement within a team using constructive strategies.",details:"Create a scenario where team members disagree and must work through it constructively.",app:m=>"Design a team scenario where disagreement arises and assess whether students can address the conflict constructively, communicate expectations, and adjust their behavior."},
-  {title:"Collaborative Feedback Exchange",desc:"Students practice giving and receiving constructive feedback within a team.",details:"Structure the exchange so students must provide specific, behavior-focused feedback and respond to feedback they receive.",app:m=>"Facilitate a structured feedback exchange within teams, assessing whether students communicate expectations clearly and adjust behavior based on feedback."},
-  {title:"Interdependent Team Task",desc:"Students complete a task where each member's contribution is essential, requiring genuine collaboration.",details:"Design the task so no one person can complete it alone. Assess how teams manage interdependence and coordination.",app:m=>"Assign a task where each team member has a distinct, essential contribution and assess how the team coordinated, leveraged strengths, and held each other accountable."}
-],
-analyze: [
-  {title:"Team Dynamics Case Study Analysis",desc:"Students analyze a case study of a team's collaborative process.",details:"Provide a detailed account including communication patterns, role dynamics, conflicts, and outcomes.",app:m=>"Present a case study of a team collaboration and ask students to analyze the dynamics — communication, role distribution, conflict management, and their impact on effectiveness."},
-  {title:"Team Process Reflection and Analysis",desc:"Students analyze their own team's collaborative process after completing a team exercise.",details:"Ask students to move beyond description to analysis — how they worked together and why it played out that way.",app:m=>"After a team exercise, ask students to analyze their team\'s process — communication patterns, role distribution, conflict handling, and what they would change."},
-  {title:"Comparative Team Analysis",desc:"Students compare two team experiences and analyze what factors made one more effective.",details:"The comparison should drive analytical insight about what makes collaboration work.",app:m=>"Have students compare two team experiences and analyze what factors made one more effective — examining communication, trust, role clarity, and conflict management."},
-  {title:"Structured Discussion on Collaboration Challenges",desc:"Students examine a common collaboration challenge from multiple perspectives.",details:"Choose an issue with genuine complexity and facilitate analytical discussion.",app:m=>"Facilitate a discussion around a collaboration challenge requiring students to analyze the issue from multiple perspectives and propose approaches."}
-],
-evaluate: [
-  {title:"Structured Peer Evaluation",desc:"Students evaluate teammates' contributions using criteria focused on collaboration quality.",details:"Provide criteria assessing collaborative behaviors — communication, reliability, conflict management, adaptability, goal support.",app:m=>m==='I'?"Have students complete peer evaluations assessing each member\'s collaborative contributions — reliability, communication, and support of team goals.":m==='M'?"Have students give and receive comprehensive peer evaluations — at this level, the evaluation process itself demonstrates the teamwork skill through transparent feedback and advocacy for team goals.":"Have students complete more sophisticated peer evaluations, assessing not just contribution but adaptability, conflict management, and mutual trust-building."},
-  {title:"Collaboration Effectiveness Evaluation",desc:"Students evaluate a team's overall collaborative process.",details:"This can be applied to the student's own team or a case study. Ask for judgment supported by evidence.",app:m=>"Ask students to evaluate a team\'s collaborative effectiveness — assessing communication, role distribution, conflict management, and goal achievement with specific evidence."},
-  {title:"Teamwork Improvement Recommendation",desc:"Students assess a struggling team and recommend strategies for improvement.",details:"Present a scenario where collaboration is breaking down and ask students to diagnose the problem and recommend interventions.",app:m=>"Present a scenario where team collaboration is breaking down and ask students to evaluate what is going wrong and recommend specific strategies for improvement."},
-  {title:"Self-Assessment of Collaborative Skills",desc:"Students evaluate their own development as team members with evidence of growth.",details:"Ask for specifics — particular moments where they contributed effectively, handled conflict, or fell short.",app:m=>"Ask students to evaluate their own growth as collaborators, providing specific evidence of contributing to team goals, managing conflict, and adapting their role."}
-],
-create: [
-  {title:"Team-Based Culminating Project",desc:"Students collaborate on a substantial project requiring genuine interdependence.",details:"The project should be complex enough that it cannot be completed separately. Assess both the deliverable and the collaborative process.",app:m=>"Assign a culminating team project on a complex problem requiring genuine collaboration. Assess both the product and the team\'s collaborative process."},
-  {title:"Collaboration Portfolio",desc:"Students compile evidence of their teamwork development with reflective analysis.",details:"Include peer feedback, self-reflections, and examples of navigating team challenges.",app:m=>"Have students compile a portfolio documenting their growth as collaborators with reflective commentary on their development."},
-  {title:"Team Process Resource",desc:"Students create a resource for building effective teams — a charter, protocol, or collaboration guide.",details:"Creating a resource for others requires deep understanding of what makes teams work.",app:m=>"Ask students to create a practical resource for improving team collaboration, demonstrating understanding of what makes teams effective."},
-  {title:"Team Process Presentation",desc:"Students present an analysis of their team's journey, documenting outcomes and process.",details:"Require reflection on how they worked together, not just what they produced.",app:m=>"Have the team present their work, documenting not just results but how they set goals, distributed roles, managed conflicts, and leveraged strengths."}
-]
-};
-SA.es9 = {
-remember: [
-  {title:"Career Pathway Exploration",desc:"Students identify types of work within their desired career and how academic preparation connects.",details:"Help students articulate the connection between what they are learning and where they are headed.",app:m=>"Ask students to identify specific roles within their career path and describe how their academic knowledge, skills, and abilities connect to those opportunities."},
-  {title:"Academic-Career Connections Map",desc:"Students map relationships between coursework and the knowledge and skills needed in their field.",details:"Help students see education as career preparation, not just a series of courses.",app:m=>"Have students create a concept map connecting their coursework to specific knowledge, skills, and abilities needed in their intended career."},
-  {title:"Career Interests and Strengths Reflection",desc:"Students reflect on personal strengths, interests, values, and goals as they relate to career exploration.",details:"Build self-awareness that supports informed career decision-making.",app:m=>"Ask students to reflect on their strengths, interests, and values, and describe how these align with their chosen career path."},
-  {title:"Professional Practice Reading Response",desc:"Students read about professional practice in their field and identify the knowledge and skills required.",details:"Provide a reading about actual professional work and ask students to identify what knowledge and abilities practitioners need.",app:m=>"Assign a reading about professional practice in your discipline and ask students to identify the specific knowledge, skills, and abilities required for success."}
-],
-apply: [
-  {title:"Applied Knowledge Problem-Solving",desc:"Students apply academic knowledge to solve a problem relevant to their career pathway.",details:"Provide a problem grounded in professional practice and ask students to use course concepts to work toward a solution.",app:m=>m==='I'?"Present a foundational problem from the career pathway with scaffolding to help students practice applying academic knowledge to professional contexts.":m==='M'?"Present a complex, real-world professional problem requiring students to integrate advanced knowledge with practical judgment to achieve a solution.":"Present a career-relevant problem requiring students to independently apply learned knowledge, explaining the concepts that support their approach."},
-  {title:"Career Relevance Application Exercise",desc:"Students connect specific course concepts to their practical application in professional settings.",details:"Ask students to take a concept from class and explain or demonstrate how it applies in their intended career.",app:m=>"Have students select a key concept from the course and demonstrate how it applies to a practical challenge in their intended profession, explaining the reasoning."},
-  {title:"Professional Scenario Simulation",desc:"Students practice applying academic knowledge in a simulated professional context.",details:"Create a scenario mirroring real professional work and assess whether students can transfer what they have learned to practice.",app:m=>"Simulate a professional scenario from your discipline and assess whether students can apply academic knowledge to navigate it effectively."},
-  {title:"Career Compatibility Reflection and Application",desc:"Students reflect on their academic and personal experiences and apply that reflection to articulate career reasoning.",details:"This connects self-reflection to career decision-making — students should explain not just what they want to do but why their preparation fits.",app:m=>"Ask students to reflect on their academic and personal experiences and explain how those experiences support their reasoning for their chosen career path."}
-],
-analyze: [
-  {title:"Theory-to-Practice Gap Analysis",desc:"Students analyze the gap between academic theory and professional practice in their field.",details:"Ask students to identify where academic preparation aligns well with professional demands and where gaps exist.",app:m=>"Have students analyze where their academic preparation aligns with professional demands in their field and where gaps exist — examining what additional knowledge or experience they would need."},
-  {title:"Professional Challenge Case Study",desc:"Students analyze a complex professional challenge using academic concepts and frameworks.",details:"Provide a detailed case from the profession and ask students to apply analytical frameworks from their coursework to understand and address the situation.",app:m=>"Present a complex professional challenge from your discipline and ask students to analyze it using academic frameworks — identifying how academic knowledge applies to understanding and resolving the challenge."},
-  {title:"Career Pathway Comparison",desc:"Students compare different career paths within their field and analyze how academic preparation connects differently to each.",details:"This helps students understand that the same academic knowledge applies differently across professional contexts.",app:m=>"Have students compare two career paths within their field and analyze how their academic preparation connects differently to the demands of each — identifying which knowledge and skills are most relevant."},
-  {title:"Stakeholder Needs Analysis",desc:"Students analyze the needs of different stakeholders in a professional context and how academic knowledge informs responses.",details:"Ask students to identify stakeholders, understand their different needs, and analyze how academic preparation helps address those needs.",app:m=>"Present a professional scenario with multiple stakeholders and ask students to analyze the different needs and perspectives at play, explaining how academic knowledge informs how to respond to each."}
-],
-evaluate: [
-  {title:"Academic Preparation Assessment",desc:"Students evaluate how well their academic preparation has equipped them for professional practice.",details:"This requires honest, evidence-based self-assessment — not just rating their confidence but identifying specific strengths and gaps.",app:m=>m==='I'?"Ask students to evaluate how their current coursework is preparing them for their career, identifying strengths and areas where they need further development.":m==='M'?"Have students produce a sophisticated evaluation of their academic preparation, integrating assessment of coursework, hands-on experience, and remaining development needs with clear rationale.":"Ask students to evaluate the alignment between their academic preparation and professional demands, providing evidence from coursework and professional exploration."},
-  {title:"Professional Solution Evaluation",desc:"Students evaluate proposed approaches to a professional problem and recommend the strongest one.",details:"Present a professional challenge with multiple possible responses and ask students to evaluate each against practical and theoretical criteria.",app:m=>"Present a professional challenge with multiple approaches and ask students to evaluate each, recommending and justifying the approach most strongly grounded in academic knowledge and professional judgment."},
-  {title:"Peer Review of Career Application",desc:"Students evaluate a classmate's work connecting academic knowledge to professional practice.",details:"Assess whether students can identify strong and weak connections between theory and practice in a peer's work.",app:m=>"Have students review a peer\'s career application work and evaluate the quality of the connections made between academic knowledge and professional practice."},
-  {title:"Career Decision Justification",desc:"Students evaluate their career choice using evidence from their academic and personal experiences.",details:"Ask students to move beyond preference to justification — explaining why their preparation, experiences, and strengths support their career direction.",app:m=>"Ask students to evaluate and justify their career choice, providing evidence from academic experiences, personal strengths, and professional exploration."}
-],
-create: [
-  {title:"Integrative Professional Project",desc:"Students complete a substantial project integrating academic learning with professional application.",details:"This should require students to independently draw on academic knowledge to address a real professional challenge.",app:m=>"Assign a project where students integrate academic learning with hands-on experience to address a complex challenge from their professional field."},
-  {title:"Career Development Plan",desc:"Students articulate a comprehensive plan building on prior learning to define career goals.",details:"The plan should demonstrate genuine integration of academic experiences, professional exploration, and self-assessment.",app:m=>"Have students articulate a career development plan building on their academic learning and experiences to define clear goals for achievement and continued learning after graduation."},
-  {title:"Knowledge Application Portfolio",desc:"Students compile evidence of their ability to connect academic preparation to professional practice.",details:"Include examples of applied knowledge, career-relevant work, and reflective analysis of the theory-to-practice connection.",app:m=>"Have students compile a portfolio demonstrating how their academic preparation connects to professional practice, with reflective analysis of their growth in applying knowledge to career contexts."},
-  {title:"Professional Presentation or Publication",desc:"Students produce a professional-quality deliverable that demonstrates command of their field's knowledge base.",details:"The deliverable should be appropriate for a professional audience and demonstrate the student's ability to operate at a professional level.",app:m=>"Ask students to produce a professional-quality deliverable for an authentic audience that demonstrates their ability to integrate academic knowledge with professional practice in their field."}
-]
-};
-SA.es10 = {
-remember: [
-  {title:"Information Literacy Foundations Check",desc:"Students identify and explain key principles of finding, evaluating, and using information responsibly.",details:"Assess whether students can describe concepts like source credibility, bias, search strategies, and ethical information use.",app:m=>"Ask students to identify and explain the key principles of information literacy — including how to develop good research questions, evaluate sources, and use information responsibly."},
-  {title:"Information Evaluation Concept Map",desc:"Students map the relationships between research questions, search strategies, source evaluation, and ethical use.",details:"Help students see information literacy as a connected process rather than isolated skills.",app:m=>"Have students create a concept map showing how developing research questions, implementing search strategies, evaluating sources, and using information ethically connect to informed decision-making."},
-  {title:"Information Habits Reflection",desc:"Students describe their own information-seeking habits and how they currently evaluate sources.",details:"Build self-awareness about information practices. Ask students to be honest about how they actually find and assess information.",app:m=>"Ask students to describe how they currently find and evaluate information — What sources do they turn to? How do they assess credibility? What habits serve them well and which ones could improve?"},
-  {title:"Source Evaluation Reading Response",desc:"Students examine a set of information sources and identify strengths and weaknesses.",details:"Provide sources of varying quality and ask students to identify which are credible and why, focusing on bias, expertise, and relevance.",app:m=>"Give students a set of information sources on the same topic and ask them to identify the strengths and weaknesses of each, explaining how they assessed credibility."}
-],
-apply: [
-  {title:"Research Question Development",desc:"Students practice developing well-scoped research questions appropriate to their field.",details:"Provide a broad topic and ask students to narrow it into a focused, researchable question with appropriate scope.",app:m=>m==='I'?"Give students a broad topic and guide them through developing a focused research question with appropriate scope for their field.":m==='M'?"Ask students to develop sophisticated research questions informed by key concepts, relevant terminology, and related questions in the field.":"Ask students to independently develop research questions with appropriate scope, using field-specific terminology and concepts."},
-  {title:"Search Strategy Implementation",desc:"Students implement systematic search strategies to find credible, relevant information.",details:"Move beyond googling to structured search strategies using field-appropriate databases and resources.",app:m=>"Have students implement a systematic search strategy for a course-relevant question, using credible resources relevant to the field and documenting their process."},
-  {title:"Source Credibility Assessment",desc:"Students evaluate information sources for bias, expertise, and point of view.",details:"Provide a set of sources and ask students to assess each for credibility, identifying elements of bias, expertise, and relevance.",app:m=>"Give students a set of sources on a field-relevant topic and ask them to evaluate each for bias, expertise, and point of view, explaining their reasoning."},
-  {title:"Evidence-Based Information Use",desc:"Students use information from credible sources to support a decision or argument, with proper attribution.",details:"Assess whether students can select relevant information, use it to support their reasoning, and cite it appropriately.",app:m=>"Ask students to use information from credible sources to support a decision or argument relevant to your course, with proper attribution of all sources used."}
-],
-analyze: [
-  {title:"Source Bias and Perspective Analysis",desc:"Students analyze the biases, expertise, and points of view present in a set of information sources.",details:"Provide sources with different perspectives on the same topic and ask students to analyze how bias and expertise shape the information presented.",app:m=>"Give students sources from different perspectives on the same topic and ask them to analyze how bias, expertise, and point of view shape the information presented in each."},
-  {title:"Cross-Source Connection Analysis",desc:"Students analyze connections between multiple sources, identifying patterns and contradictions.",details:"Ask students to look across sources for connections, contradictions, and complementary findings — building toward synthesis.",app:m=>"Provide multiple sources on a field-relevant topic and ask students to analyze the connections between them — identifying patterns, contradictions, and how the sources complement or challenge one another."},
-  {title:"Information Quality Comparison",desc:"Students compare information sources of different quality and analyze what makes some more reliable than others.",details:"Provide a range of sources and ask students to compare and analyze the factors that make some more credible, relevant, and useful.",app:m=>"Give students information sources of varying quality and ask them to compare them, analyzing what specific factors make some more reliable and relevant than others."},
-  {title:"Research Methodology Analysis",desc:"Students analyze how information was gathered and presented in a study or report, identifying strengths and limitations.",details:"Ask students to examine not just what a source says but how the information was collected, presented, and whether the methodology supports the conclusions.",app:m=>"Present a study or report from your field and ask students to analyze the research methodology — examining how information was gathered, whether the approach was appropriate, and what limitations exist."}
-],
-evaluate: [
-  {title:"Source Critique and Evaluation",desc:"Students critically evaluate information sources, thoroughly assessing bias, expertise, relevance, and currency.",details:"Provide substantive sources and ask students to render a judgment about quality and reliability, supported by specific evidence.",app:m=>m==='I'?"Give students a set of sources and ask them to evaluate strengths and weaknesses, identifying elements of bias and expertise.":m==='M'?"Ask students to critique information sources thoroughly, evaluating bias, expertise, point of view, and relevance and currency to the field — demonstrating the critical evaluation expected of practitioners.":"Ask students to evaluate sources with greater sophistication, analyzing how bias, expertise, and point of view affect the reliability and usefulness of the information."},
-  {title:"Evidence-Based Recommendation",desc:"Students evaluate available information and recommend a course of action, justifying their reasoning with evidence.",details:"Present a decision scenario where information quality matters and ask students to evaluate sources, identify the strongest evidence, and produce a justified recommendation.",app:m=>"Present a scenario requiring an informed decision and ask students to evaluate the available information, identify the strongest evidence, and recommend a course of action with clear justification."},
-  {title:"Peer Review of Research Process",desc:"Students evaluate a classmate's information-gathering and source evaluation process.",details:"Assess whether students can identify strong and weak information practices in a peer's research process.",app:m=>"Have students review a peer\'s research process and evaluate the quality of their search strategy, source selection, and use of evidence."},
-  {title:"Self-Assessment of Information Literacy",desc:"Students evaluate their own development in finding, evaluating, and using information responsibly.",details:"Ask for honest, evidence-based self-assessment of information literacy growth.",app:m=>"Ask students to evaluate their own growth in information literacy — How has their ability to find, evaluate, and use information developed? What specific evidence supports their assessment?"}
-],
-create: [
-  {title:"Original Research or Investigation",desc:"Students conduct original research on a field-relevant question, from question formulation through evidence synthesis.",details:"Students should formulate a question, develop and execute a search strategy, evaluate sources, synthesize findings, and present conclusions with proper attribution.",app:m=>"Assign a research project where students formulate a field-relevant question, execute a comprehensive search strategy, evaluate and synthesize sources, and present well-supported conclusions."},
-  {title:"Evidence-Based Proposal or Report",desc:"Students produce a proposal or report grounded in thoroughly evaluated evidence from credible sources.",details:"The report should demonstrate the full range of information literacy skills — strategic searching, critical evaluation, synthesis, and ethical attribution.",app:m=>"Ask students to produce a professional-quality report or proposal grounded in thoroughly evaluated evidence, demonstrating strategic searching, critical source evaluation, and synthesis of findings."},
-  {title:"Information Literacy Portfolio",desc:"Students compile evidence of their development in finding, evaluating, and using information with reflective analysis.",details:"Show progression from basic source identification to sophisticated evaluation and synthesis, with reflection on growth.",app:m=>"Have students compile a portfolio documenting their information literacy development — from question formulation through source evaluation to evidence-based decision-making — with reflective analysis."},
-  {title:"Annotated Bibliography or Literature Review",desc:"Students produce a substantive annotated bibliography or literature review demonstrating critical source evaluation and synthesis.",details:"This should demonstrate that students can not only find and evaluate sources but identify patterns across them, exclude irrelevant information, and draw informed conclusions.",app:m=>"Ask students to produce an annotated bibliography or literature review that demonstrates critical evaluation of each source and synthesis of patterns across sources, using attribution conventions appropriate to the field."}
-]
+
+// ============================================================
+// SKILL-SPECIFIC ASSESSMENT TYPE REPLACEMENTS
+// These replace entire assessment entries (title, desc, details, app)
+// where the generic type doesn't naturally fit the skill.
+// Keyed by skill → bloom level → index position in the generic array.
+// ============================================================
+const skillReplacements = {
+    es4: {
+        apply: {
+            1: { title:"Active Listening and Perspective-Taking Practice", desc:"Students practice listening to understand — not just to respond — and demonstrate they can accurately represent another person's viewpoint.", details:"Pair students for a structured exercise where they must listen to their partner's perspective, paraphrase it, and confirm accuracy before sharing their own. Assess the quality of listening and representation, not who 'wins' the exchange.",
+                appFn:(sk,m) => m==='I' ? "Set up a structured paired exercise where students practice active listening and perspective-taking. Provide guiding prompts to help them focus on understanding — rather than evaluating — their partner's viewpoint." : "Facilitate a perspective-taking exercise where students must accurately represent viewpoints different from their own, demonstrating they can identify multiple perspectives through genuine interaction." }
+        },
+        analyze: {
+            1: { title:"Interpersonal Interaction Analysis", desc:"Students analyze a real or simulated interpersonal exchange, examining how perspectives, assumptions, and communication patterns influenced the outcome.", details:"Provide a detailed interaction — video, case study, or transcript — and ask students to go beyond describing what happened to analyzing why it happened and what interpersonal dynamics were at play.",
+                appFn:(sk,m) => "Give students a detailed interpersonal exchange and ask them to analyze the perspectives, assumptions, and communication patterns at play — explaining how self-awareness (or lack of it) influenced the interaction's outcome." },
+            3: { title:"Communication Pattern Analysis", desc:"Students examine patterns in how people interact in a specific context, identifying what supports and what undermines effective relationships.", details:"Ask students to observe or review interactions in a team, workplace, or community context and analyze the communication patterns — What promotes positive interaction? What creates barriers? Why?",
+                appFn:(sk,m) => "Have students analyze the communication and interaction patterns in a specific context — a team project, a workplace observation, or a case study — identifying which patterns support effective interaction and which create barriers." }
+        }
+    },
+    es5: {
+        apply: {
+            1: { title:"Adaptive Response Simulation", desc:"Students work through a task where conditions change midway, requiring them to adjust their approach and support others through the transition.", details:"Introduce a planned shift partway through the exercise — new constraints, changed requirements, or unexpected information. Assess how students respond: Do they resist or adapt? Do they help others adjust? Debrief afterward about strategies used.",
+                appFn:(sk,m) => "Design an exercise where conditions shift during the task — changing the parameters, adding constraints, or introducing new information — and assess how students adjust their approach and support their peers through the transition." }
+        },
+        analyze: {
+            1: { title:"Change Dynamics Case Study", desc:"Students analyze a detailed case of a team or organization navigating significant change, examining leadership decisions, adaptive strategies, and group dynamics.", details:"Provide enough detail that students can trace the change process — identifying barriers, adaptive strategies, leadership decisions, and their consequences. Ask for analysis, not just summary.",
+                appFn:(sk,m) => "Give students a case study of a team or organization navigating major change and ask them to analyze the leadership decisions, adaptive strategies, and group dynamics — identifying what supported and what hindered successful adaptation." }
+        }
+    },
+    es6: {
+        apply: {
+            1: { title:"Professional Accountability Task", desc:"Students manage a multi-step assignment with deadlines, demonstrating organization, time management, and reliability.", details:"Design an assignment with interim deliverables and deadlines. Assess not just the final product but the professional behaviors — Did they meet deadlines? Take accountability for mistakes? Use feedback to improve?",
+                appFn:(sk,m) => "Assign a multi-step project with interim deadlines and assess both the quality of the work and the professional behaviors demonstrated — meeting deadlines, managing time effectively, and taking accountability when things don't go as planned." }
+        },
+        analyze: {
+            1: { title:"Professional Ethics Case Analysis", desc:"Students analyze an ethical dilemma from their field, examining the competing obligations, stakeholder perspectives, and professional standards at play.", details:"Use a case with genuine complexity — competing ethical obligations, multiple stakeholders, real consequences. Ask students to analyze the situation, not just choose a side.",
+                appFn:(sk,m) => "Present an ethical case study from your field and ask students to analyze the competing obligations, stakeholder perspectives, and professional standards at play — explaining why the dilemma is complex and what factors should guide the decision." },
+            3: { title:"Industry Standards Examination", desc:"Students examine how professional standards and practices function within their field, analyzing how they shape day-to-day professional behavior.", details:"Ask students to investigate current industry standards and best practices, analyzing how these standards are applied, why they matter, and how staying current supports professional effectiveness.",
+                appFn:(sk,m) => "Ask students to research and analyze current industry standards or best practices in their field, examining how these standards shape professional behavior and why staying current matters for practitioners." }
+        }
+    },
+    es8: {
+        apply: {
+            1: { title:"Constructive Feedback and Conflict Practice", desc:"Students practice giving and receiving constructive feedback and navigating disagreement within a team context.", details:"Structure the exercise so students must provide specific, behavior-focused feedback and work through a disagreement constructively. This builds the communication and conflict management skills that sustain effective teams.",
+                appFn:(sk,m) => "Design a team scenario where a disagreement naturally arises — competing priorities, different approaches, or role confusion — and assess whether students can address the conflict constructively and adjust their behavior based on the exchange." }
+        },
+        analyze: {
+            1: { title:"Team Dynamics Case Study", desc:"Students analyze a detailed account of a team's collaborative process, examining communication patterns, role dynamics, and conflict management.", details:"Provide a detailed case — meeting notes, a project post-mortem, or a scenario — and ask students to analyze what factors drove team success or failure, going beyond description to explain why specific dynamics mattered.",
+                appFn:(sk,m) => "Present a case study of a team collaboration and ask students to analyze the dynamics — examining communication patterns, role distribution, conflict management, and how these factors influenced the team's effectiveness." },
+            3: { title:"Team Process Reflection and Analysis", desc:"Students analyze their own team's collaborative process after a group exercise, identifying patterns in communication, contribution, and conflict management.", details:"After a team experience, ask students to move beyond 'what we did' to 'how we worked together and why.' Provide an analytical framework to guide the reflection so it produces genuine analysis rather than general impressions.",
+                appFn:(sk,m) => "After a team exercise, ask students to analyze their own team's process — What communication patterns emerged? How were roles distributed? How was conflict handled? What would they change for next time?" }
+        }
+    }
 };
 
 // ============================================================
@@ -1070,23 +1118,24 @@ create: [
 function getAlignmentMessage(mastery, blooms) {
     const level = bloomsLevels.find(b => b.id === blooms);
     const isTypical = level.typicalFor.includes(mastery);
+
     if (isTypical) {
-        return { icon:"\u2705", title:"Strong Alignment",
-            msg:"The cognitive level you selected (<em>"+level.title+"</em>) is well-aligned with courses that <strong>"+masteryInfo[mastery].label.toLowerCase()+"</strong> this skill. The assessment options below should work well with your current learning outcomes."
+        return { icon:"✅", title:"Strong Alignment",
+            msg:`The cognitive level you selected (<em>${level.title}</em>) is well-aligned with courses that <strong>${masteryInfo[mastery].label.toLowerCase()}</strong> this skill. The assessment options below should work well with your current learning outcomes.`
         };
     }
     if (mastery === 'I' && (blooms === 'evaluate' || blooms === 'create')) {
-        return { icon:"\u{1F4A1}", title:"Something to Consider",
-            msg:"Your course <strong>introduces</strong> this skill, but the outcomes you described align with a higher cognitive level (<em>"+level.title+"</em>). This isn\u2019t necessarily a problem \u2014 but it\u2019s worth checking whether your learning outcomes reflect the introductory nature of the course. If your outcomes use advanced verbs like \u201cevaluate\u201d or \u201ccreate,\u201d your course may actually be reinforcing or building toward mastery. The assessments below are tailored to your selection, but you might also explore what the <em>Reinforced</em> or <em>Mastered</em> level suggests."
+        return { icon:"💡", title:"Something to Consider",
+            msg:`Your course <strong>introduces</strong> this skill, but the outcomes you described align with a higher cognitive level (<em>${level.title}</em>). This isn't necessarily a problem — but it's worth checking whether your learning outcomes reflect the introductory nature of the course. If your outcomes use advanced verbs like "evaluate" or "create," your course may actually be reinforcing or building toward mastery. The assessments below are tailored to your selection, but you might also explore what the <em>Reinforced</em> or <em>Mastered</em> level suggests.`
         };
     }
     if (mastery === 'M' && (blooms === 'remember' || blooms === 'apply')) {
-        return { icon:"\u{1F4A1}", title:"Something to Consider",
-            msg:"Your course expects students to <strong>master</strong> this skill, but the outcomes you described align with a foundational cognitive level (<em>"+level.title+"</em>). Mastery typically involves higher-order thinking like evaluation, judgment, or original creation. It may be worth reviewing whether your learning outcomes fully capture the depth of what you expect students to demonstrate. The assessments below match your selection, but you may also want to see what <em>Evaluate & Justify</em> or <em>Create & Design</em> level options look like."
+        return { icon:"💡", title:"Something to Consider",
+            msg:`Your course expects students to <strong>master</strong> this skill, but the outcomes you described align with a foundational cognitive level (<em>${level.title}</em>). Mastery typically involves higher-order thinking like evaluation, judgment, or original creation. It may be worth reviewing whether your learning outcomes fully capture the depth of what you expect students to demonstrate. The assessments below match your selection, but you may also want to see what <em>Evaluate & Justify</em> or <em>Create & Design</em> level options look like.`
         };
     }
-    return { icon:"\u{1F4DD}", title:"A Note on Alignment",
-        msg:"The cognitive level you selected (<em>"+level.title+"</em>) is a less typical pairing with courses at the <strong>"+masteryInfo[mastery].label.toLowerCase()+"</strong> level, though it can absolutely be appropriate depending on your course context. The assessments below are tailored to your selection. If you\u2019d like to compare, consider exploring what a different cognitive level suggests for this level."
+    return { icon:"📝", title:"A Note on Alignment",
+        msg:`The cognitive level you selected (<em>${level.title}</em>) is a less typical pairing with courses at the <strong>${masteryInfo[mastery].label.toLowerCase()}</strong> level, though it can absolutely be appropriate depending on your course context. The assessments below are tailored to your selection. If you'd like to compare, consider exploring what a different cognitive level suggests for this level.`
     };
 }
 
@@ -1096,15 +1145,15 @@ function getWatchout(mastery, blooms) {
         tips.push("At the <strong>Mastered</strong> level, assessments should require students to demonstrate the skill independently, in authentic or complex contexts. If your current assessments provide significant scaffolding (step-by-step instructions, templates, fill-in-the-blank formats), they may be assessing at a lower level than intended.");
     }
     if (mastery === 'I') {
-        tips.push("When a skill is being <strong>introduced</strong>, students benefit from lower-stakes assessments with clear expectations and supportive feedback. If your current assessments penalize students heavily for incomplete mastery of a skill they\u2019re just encountering, consider adjusting the weight or format.");
+        tips.push("When a skill is being <strong>introduced</strong>, students benefit from lower-stakes assessments with clear expectations and supportive feedback. If your current assessments penalize students heavily for incomplete mastery of a skill they're just encountering, consider adjusting the weight or format.");
     }
     if (blooms === 'evaluate' || blooms === 'create') {
-        tips.push("Higher-order assessments like critiques and original projects need <strong>clear rubrics</strong> that specify what proficient performance looks like. Without explicit criteria, both you and your students may have different expectations of what \u2018quality\u2019 means.");
+        tips.push("Higher-order assessments like critiques and original projects need <strong>clear rubrics</strong> that specify what proficient performance looks like. Without explicit criteria, both you and your students may have different expectations of what 'quality' means.");
     }
     if (blooms === 'remember') {
         tips.push("If your assessments focus primarily on recall (multiple choice, matching, definitions), they may not fully capture whether students understand the concepts well enough to use them. Consider adding at least one assessment that asks students to <strong>explain</strong> or <strong>apply</strong> what they know.");
     }
-    tips.push("Review your learning outcomes alongside your assessments. The verbs in your outcomes (describe, analyze, create, etc.) signal what students should be able to <strong>do</strong>. Your assessments should give students the opportunity to <em>demonstrate those specific actions</em>. If there\u2019s a gap, the most actionable fix is usually adjusting the assessment rather than rewriting the outcome.");
+    tips.push("Review your learning outcomes alongside your assessments. The verbs in your outcomes (describe, analyze, create, etc.) signal what students should be able to <strong>do</strong>. Your assessments should give students the opportunity to <em>demonstrate those specific actions</em>. If there's a gap, the most actionable fix is usually adjusting the assessment rather than rewriting the outcome.");
     return tips;
 }
 
@@ -1143,7 +1192,7 @@ function updateProgress() {
 }
 
 // ============================================================
-// STEP 1: SKILL SELECTION
+// STEP 1
 // ============================================================
 function renderSkillCards() {
     const grid = document.getElementById('skill-grid');
@@ -1155,14 +1204,14 @@ function renderSkillCards() {
         card.tabIndex = 0;
         card.onclick = () => selectSkill(sk.id);
         card.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();selectSkill(sk.id);} };
-        card.innerHTML = '<div class="skill-num">'+sk.num+'</div><div class="skill-info"><h4>'+sk.name+'</h4><p class="skill-desc">'+sk.desc+'</p></div>';
+        card.innerHTML = `<div class="skill-num">${sk.num}</div><div class="skill-info"><h4>${sk.name}</h4><p class="skill-desc">${sk.desc}</p></div>`;
         grid.appendChild(card);
     });
 }
 
 function selectSkill(id) {
     document.querySelectorAll('.skill-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelector('[data-skill="'+id+'"]').classList.add('selected');
+    document.querySelector(`[data-skill="${id}"]`).classList.add('selected');
     state.skill = id; state.mastery = null; state.blooms = null;
     document.getElementById('skill-next').disabled = false;
     document.querySelectorAll('.mastery-card').forEach(c=>c.classList.remove('selected'));
@@ -1171,18 +1220,18 @@ function selectSkill(id) {
 }
 
 // ============================================================
-// STEP 2: MASTERY
+// STEP 2
 // ============================================================
 function selectMastery(level) {
     document.querySelectorAll('.mastery-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelector('[data-mastery="'+level+'"]').classList.add('selected');
+    document.querySelector(`[data-mastery="${level}"]`).classList.add('selected');
     state.mastery = level; state.blooms = null;
     document.getElementById('mastery-next').disabled = false;
     document.getElementById('blooms-next').disabled = true;
 }
 
 // ============================================================
-// STEP 3: BLOOM'S
+// STEP 3
 // ============================================================
 function renderBloomsCards() {
     const grid = document.getElementById('blooms-grid');
@@ -1195,14 +1244,21 @@ function renderBloomsCards() {
         card.tabIndex = 0;
         card.onclick = () => selectBlooms(level.id);
         card.onkeydown = e => { if(e.key==='Enter'||e.key===' '){e.preventDefault();selectBlooms(level.id);} };
-        card.innerHTML = '<div class="blooms-icon">'+level.icon+'</div><div class="blooms-content"><h4>'+level.title+'</h4><div class="blooms-tag">'+level.tag+'</div><p class="blooms-desc">'+level.desc+'</p><p class="blooms-verbs">'+level.verbs+'</p></div>';
+        card.innerHTML = `
+            <div class="blooms-icon">${level.icon}</div>
+            <div class="blooms-content">
+                <h4>${level.title}</h4>
+                <div class="blooms-tag">${level.tag}</div>
+                <p class="blooms-desc">${level.desc}</p>
+                <p class="blooms-verbs">${level.verbs}</p>
+            </div>`;
         grid.appendChild(card);
     });
 }
 
 function selectBlooms(id) {
     document.querySelectorAll('.blooms-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelector('[data-blooms="'+id+'"]').classList.add('selected');
+    document.querySelector(`[data-blooms="${id}"]`).classList.add('selected');
     state.blooms = id;
     document.getElementById('blooms-next').disabled = false;
 }
@@ -1216,43 +1272,62 @@ function showResults() {
     const rl = getRubricLevel(state.mastery);
     const indicators = rubricIndicators[skill.id][rl];
 
-    document.getElementById('result-skill').textContent = 'ES'+skill.num+': '+skill.name;
+    // Summary
+    document.getElementById('result-skill').textContent = `ES${skill.num}: ${skill.name}`;
     document.getElementById('result-mastery').textContent = masteryInfo[state.mastery].full;
-    document.getElementById('result-blooms').textContent = bloom.title+' ('+bloom.tag+')';
+    document.getElementById('result-blooms').textContent = `${bloom.title} (${bloom.tag})`;
 
     // Rubric context
-    document.getElementById('rubric-context').innerHTML =
-        '<h4>What the Rubric Expects at This Level</h4>'+
-        '<p>According to the CPE\u2019s performance indicators, a student at the <strong>'+getRubricLevelLabel(state.mastery)+'</strong> level for this skill:</p>'+
-        '<ul>'+indicators.map(function(i){return '<li>'+i+'</li>';}).join('')+'</ul>'+
-        '<p style="margin-top:10px;font-size:12.5px;color:var(--text-light);">These indicators can help you evaluate whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with both this rubric level and the cognitive level you selected.</p>';
+    const rubricBox = document.getElementById('rubric-context');
+    const levelWord = state.mastery === 'M' ? 'mastered' : (state.mastery === 'R' ? 'reinforced' : 'introduced');
+    rubricBox.innerHTML = `
+        <h4>What the Rubric Expects at This Level</h4>
+        <p>According to the CPE's performance indicators, a student at the <strong>${getRubricLevelLabel(state.mastery)}</strong> level for this skill:</p>
+        <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
+        <p style="margin-top:10px;font-size:12.5px;color:var(--text-light);">These indicators can help you evaluate whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with both this rubric level and the cognitive level you selected.</p>
+    `;
 
     // Alignment
     const align = getAlignmentMessage(state.mastery, state.blooms);
-    document.getElementById('alignment-check').innerHTML =
-        '<h4><span>'+align.icon+'</span> '+align.title+'</h4><p>'+align.msg+'</p>';
+    document.getElementById('alignment-check').innerHTML = `
+        <h4><span>${align.icon}</span> ${align.title}</h4>
+        <p>${align.msg}</p>`;
 
     // Assessments
     const container = document.getElementById('solutions-container');
     container.innerHTML = '';
-    const skillAssessments = SA[skill.id][state.blooms];
-    skillAssessments.forEach(function(item) {
+    const appOverrides = skillSpecificApps[skill.id]?.[state.blooms];
+    const typeReplacements = skillReplacements[skill.id]?.[state.blooms];
+    assessments[state.blooms].forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'solution-item';
-        const appNote = item.app(state.mastery);
-        div.innerHTML =
-            '<h4>'+item.title+'</h4>'+
-            '<p>'+item.desc+'</p>'+
-            '<p>'+item.details+'</p>'+
-            '<div class="application-note"><strong>In Your Course:</strong> '+appNote+'</div>';
+        const replacement = typeReplacements?.[idx];
+        if (replacement) {
+            div.innerHTML = `
+                <h4>${replacement.title}</h4>
+                <p>${replacement.desc}</p>
+                <p>${replacement.details}</p>
+                <div class="application-note">
+                    <strong>In Your Course:</strong> ${replacement.appFn(skill, state.mastery)}
+                </div>`;
+        } else {
+            const appNote = appOverrides ? appOverrides[idx](skill, state.mastery) : item.appFn(skill, state.mastery);
+            div.innerHTML = `
+                <h4>${item.title}</h4>
+                <p>${item.desc}</p>
+                <p>${item.details}</p>
+                <div class="application-note">
+                    <strong>In Your Course:</strong> ${appNote}
+                </div>`;
+        }
         container.appendChild(div);
     });
 
     // Watchout
     const tips = getWatchout(state.mastery, state.blooms);
-    document.getElementById('watchout-section').innerHTML =
-        '<h4><span>\u26A0\uFE0F</span> Common Pitfalls to Watch For</h4>'+
-        tips.map(function(t){return '<p style="margin-bottom:10px;">'+t+'</p>';}).join('');
+    document.getElementById('watchout-section').innerHTML = `
+        <h4><span>⚠️</span> Common Pitfalls to Watch For</h4>
+        ${tips.map(t=>`<p style="margin-bottom:10px;">${t}</p>`).join('')}`;
 
     goToScreen('results-screen');
 }
@@ -1262,7 +1337,7 @@ function showResults() {
 // ============================================================
 function restartTool() {
     state.skill=null; state.mastery=null; state.blooms=null;
-    document.querySelectorAll('.skill-card,.mastery-card,.blooms-card').forEach(function(c){c.classList.remove('selected');});
+    document.querySelectorAll('.skill-card,.mastery-card,.blooms-card').forEach(c=>c.classList.remove('selected'));
     document.getElementById('skill-next').disabled=true;
     document.getElementById('mastery-next').disabled=true;
     document.getElementById('blooms-next').disabled=true;
