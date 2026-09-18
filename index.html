@@ -180,7 +180,7 @@
             grid-template-columns: 1fr 1fr;
             grid-auto-rows: 1fr;
             gap: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 20px;
         }
         .skill-card {
             background: var(--white);
@@ -218,6 +218,54 @@
         .skill-info { flex: 1; }
         .skill-info h4 { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; line-height: 1.3; }
         .skill-desc { font-size: 12.5px; color: var(--text-light); line-height: 1.45; }
+
+        /* Secondary skill */
+        .secondary-skill-box {
+            background: var(--white);
+            border: 2px solid var(--lavender);
+            border-radius: var(--radius-md);
+            padding: 20px 22px;
+            margin-bottom: 28px;
+        }
+        .secondary-skill-label {
+            display: block;
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: 16px;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+        .optional-tag {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--lavender-light);
+            color: var(--plum);
+            border-radius: 8px;
+            padding: 2px 8px;
+            letter-spacing: 0.3px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .secondary-skill-hint {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.55;
+            margin-bottom: 12px;
+        }
+        .form-select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 2px solid var(--lavender);
+            border-radius: var(--radius-sm);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            background: var(--white);
+            transition: border-color 0.2s;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+        .form-select:focus { outline: none; border-color: var(--navy); }
 
         /* Mastery Cards */
         .mastery-grid {
@@ -331,7 +379,7 @@
             display: flex; align-items: baseline; gap: 10px;
             margin-bottom: 8px; font-size: 14.5px;
         }
-        .summary-label { font-weight: 700; color: var(--plum); min-width: 110px; flex-shrink: 0; }
+        .summary-label { font-weight: 700; color: var(--plum); min-width: 130px; flex-shrink: 0; }
         .summary-value { color: var(--text-dark); }
 
         .rubric-context {
@@ -352,6 +400,20 @@
             margin: 8px 0 0 18px; font-size: 13.5px; color: var(--text-mid); line-height: 1.65;
         }
         .rubric-context li { margin-bottom: 4px; }
+
+        .cbin-level-badge {
+            display: inline-block;
+            background: var(--navy);
+            color: var(--cream);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .cbin-indicator-lead { font-weight: 700; color: var(--navy); }
 
         .alignment-check {
             background: linear-gradient(135deg, var(--navy), var(--plum));
@@ -471,9 +533,18 @@
         <div class="screen" id="skill-screen">
             <div class="info-box">
                 <h3>Step 1: Select an Essential Skill</h3>
-                <p>Choose the Essential Skill you'd like to explore assessment options for. If your course addresses multiple skills, you can return to explore additional skills after completing the process.</p>
+                <p>Choose the Essential Skill you'd like to explore assessment options for. If your course addresses more than one skill, select the primary one here — you'll have the option to add a second skill below.</p>
             </div>
             <div class="skill-grid" id="skill-grid"></div>
+
+            <div class="secondary-skill-box" id="secondary-skill-box" style="display:none;">
+                <label class="secondary-skill-label" for="secondary-skill">Does this course also address another Essential Skill? <span class="optional-tag">Optional</span></label>
+                <p class="secondary-skill-hint">Courses often address more than one Essential Skill, and a well-designed assignment can generate meaningful evidence for more than one at a time. If you select a second skill, your results will include its performance indicators alongside the primary skill's.</p>
+                <select class="form-select" id="secondary-skill" onchange="setSecondarySkill(this.value)">
+                    <option value="">No — focus on my primary skill only</option>
+                </select>
+            </div>
+
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="goToScreen('welcome-screen')">Back</button>
                 <button class="btn btn-primary" id="skill-next" disabled onclick="goToScreen('mastery-screen')">Continue</button>
@@ -513,7 +584,7 @@
         <div class="screen" id="blooms-screen">
             <div class="info-box">
                 <h3>Step 3: What Are Students Expected to Demonstrate?</h3>
-                <p>Think about the learning outcomes in your course related to <strong id="blooms-skill-name"></strong>. Which description below best captures what students are expected to <em>do</em>? Select the one that feels like the closest match — there is no wrong answer here.</p>
+                <p>Think about the learning outcomes in your course related to <strong id="blooms-skill-name"></strong>. Which description below best captures what students are expected to <em>do</em>? Select the one that feels like the closest match — there is no wrong answer here. If your outcomes span multiple levels, select the highest level students are expected to reach.</p>
             </div>
             <div class="alignment-hint" id="alignment-hint"></div>
             <div class="blooms-grid" id="blooms-grid"></div>
@@ -525,19 +596,21 @@
 
         <!-- STEP 4: RESULTS -->
         <div class="screen" id="results-screen">
-            <div class="selection-summary">
-                <h4>Your Selections</h4>
-                <div class="summary-row"><span class="summary-label">Essential Skill:</span><span class="summary-value" id="result-skill"></span></div>
-                <div class="summary-row"><span class="summary-label">Course Level:</span><span class="summary-value" id="result-mastery"></span></div>
-                <div class="summary-row"><span class="summary-label">Student Focus:</span><span class="summary-value" id="result-blooms"></span></div>
-            </div>
-            <div class="rubric-context" id="rubric-context"></div>
+            <div class="rubric-context" id="cbin-context"></div>
             <div class="alignment-check" id="alignment-check"></div>
             <div class="solutions-section">
                 <h3>Recommended Assessment Approaches</h3>
                 <p class="solutions-subtitle">These suggestions are designed to be adapted to any discipline. Consider which approaches best fit your course content and student needs.</p>
                 <div id="solutions-container"></div>
                 <div class="watchout-section" id="watchout-section"></div>
+            </div>
+            <div class="selection-summary">
+                <h4>Your Selections</h4>
+                <div class="summary-row"><span class="summary-label">Essential Skill:</span><span class="summary-value" id="result-skill"></span></div>
+                <div class="summary-row" id="result-secondary-row" style="display:none;"><span class="summary-label">Also Addresses:</span><span class="summary-value" id="result-secondary"></span></div>
+                <div class="summary-row"><span class="summary-label">Course Level:</span><span class="summary-value" id="result-mastery"></span></div>
+                <div class="summary-row"><span class="summary-label">CPE Rubric Level:</span><span class="summary-value" id="result-cbin"></span></div>
+                <div class="summary-row"><span class="summary-label">Student Focus:</span><span class="summary-value" id="result-blooms"></span></div>
             </div>
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="goToScreen('blooms-screen')">Back</button>
@@ -566,136 +639,136 @@ const skills = [
 
 // ============================================================
 // CPE RUBRIC PERFORMANCE INDICATORS
-// I & R both map to Milestone; M maps to Capstone
+// I & R map to Milestone; M maps to Capstone
 // ============================================================
 const rubricIndicators = {
     es1: {
         milestone: [
-            "Give focused attention to others, ask clarifying questions, and show awareness of nonverbal signals",
-            "Write formally and informally using logical structure, complete sentences, standard grammar, and correct punctuation",
-            "Engage in formal conversations with peers and professionals by offering information and ideas"
+            "Gives focused attention to others, asks clarifying questions, and shows awareness of nonverbal signals",
+            "Writes formally and informally using logical structure, complete sentences, standard grammar, and correct punctuation",
+            "Engages in formal conversations with peers and professionals by offering information and ideas"
         ],
         capstone: [
-            "Facilitate conversation by using active listening techniques and nonverbal signals",
-            "Tailor written communication to the audience and situation, using professional vocabulary, tone, and logically organized structure suited to the context and purpose",
-            "Prepare, structure, and deliver an oral presentation in a professional setting"
+            "Facilitates conversation by using active listening techniques and nonverbal signals",
+            "Tailors written communication to the audience and situation, using professional vocabulary, tone, and logically organized structure suited to the context and purpose",
+            "Prepares, structures, and delivers an oral presentation in a professional setting"
         ]
     },
     es2: {
         milestone: [
-            "Identify aspects of a problem clearly by locating and using relevant sources of information",
-            "Seek out and consider different perspectives on a problem",
-            "Articulate patterns, relationships, context, and other factors relevant to a problem",
-            "Link concepts to generate novel ideas or solutions to problems"
+            "Identifies aspects of a problem clearly by locating and using relevant sources of information",
+            "Seeks out and considers different perspectives on a problem",
+            "Articulates patterns, relationships, context, and other factors relevant to a problem",
+            "Links concepts to generate novel ideas or solutions to problems"
         ],
         capstone: [
-            "Analyze a problem and its components accurately using credible sources, data, and information",
-            "Evaluate alternative perspectives, allowing new information to add depth to thinking about a problem",
-            "Evaluate reasonable implications and weigh and synthesize significant evidence and relevant perspectives to draw informed and innovative conclusions",
-            "Integrate varied perspectives to propose an innovative idea or solution"
+            "Analyzes a problem and its components accurately using credible sources, data, and information",
+            "Evaluates alternative perspectives, allowing new information to add depth to thinking about a problem",
+            "Evaluates reasonable implications and weighs and synthesizes significant evidence and relevant perspectives to draw informed and innovative conclusions",
+            "Integrates varied perspectives to propose an innovative idea or solution"
         ]
     },
     es3: {
         milestone: [
-            "Illustrate contextual data using a variety of models, including equations, graphs, and tables",
-            "Apply percentages and statistics to describe contextual data",
-            "Utilize a variety of quantitative strategies to articulate assumptions and solve problems"
+            "Illustrates contextual data using a variety of models, including equations, graphs, and tables",
+            "Applies percentages and statistics to describe contextual data",
+            "Utilizes a variety of quantitative strategies to articulate assumptions and solve problems"
         ],
         capstone: [
-            "Analyze real-world data (e.g., case studies, simulations, experiments) using appropriate quantitative and qualitative strategies",
-            "Differentiate between appropriate and inappropriate uses of statistics within real-world contexts",
-            "Apply quantitative reasoning to real-world scenarios to reach well-reasoned and data-informed conclusions"
+            "Analyzes real-world data (e.g., case studies, simulations, experiments) using appropriate quantitative and qualitative strategies",
+            "Differentiates between appropriate and inappropriate uses of statistics within real-world contexts",
+            "Applies quantitative reasoning to real-world scenarios to reach well-reasoned and data-informed conclusions"
         ]
     },
     es4: {
         milestone: [
-            "Identify how one's own perspectives and lived experiences impact relationships",
-            "Identify positive ways to interact with people",
-            "Identify multiple perspectives, ideas, and beliefs through interactions"
+            "Identifies how one's own perspectives and lived experiences impact relationships",
+            "Identifies positive ways to interact with people",
+            "Identifies multiple perspectives, ideas, and beliefs through interactions"
         ],
         capstone: [
-            "Articulate insights into one's own perspectives and lived experiences that create openness to positive interactions with others",
-            "Create positive interactions with people",
-            "Engage effectively with individuals by applying insights about one's own perspectives and beliefs to relate to others and bridge differences"
+            "Articulates insights into one's own perspectives and lived experiences that create openness to positive interactions with others",
+            "Creates positive interactions with people",
+            "Engages effectively with individuals by applying insights about one's own perspectives and beliefs to relate to others and bridge differences"
         ]
     },
     es5: {
         milestone: [
-            "Contribute toward achieving a common goal",
-            "Adjust to new situations by doing things differently and showing a positive mindset",
-            "Encourage others to persist in achieving goals through changing situations"
+            "Contributes toward achieving a common goal",
+            "Adjusts to new situations by doing things differently and showing a positive mindset",
+            "Encourages others to persist in achieving goals through changing situations"
         ],
         capstone: [
-            "Overcome barriers or obstacles to achieving a common goal, often by providing guidance and support to others",
-            "Respond to and anticipates change by practicing and modeling new strategies and tools to thrive in a dynamic environment",
-            "Coach others through changing situations"
+            "Overcomes barriers or obstacles to achieving a common goal, often by providing guidance and support to others",
+            "Responds to and anticipates change by practicing and modeling new strategies and tools to thrive in a dynamic environment",
+            "Coaches others through changing situations"
         ]
     },
     es6: {
         milestone: [
-            "Describe what constitutes ethical behavior and makes choices accordingly",
-            "Apply organizational and time management skills to prioritize and complete assigned tasks",
-            "Take personal accountability for actions, including mistakes",
-            "Converse with others using field-specific terminology and tools"
+            "Describes what constitutes ethical behavior and makes choices accordingly",
+            "Applies organizational and time management skills to prioritize and complete assigned tasks",
+            "Takes personal accountability for actions, including mistakes",
+            "Converses with others using field-specific terminology and tools"
         ],
         capstone: [
-            "Model ethical behavior and adhere to a professional code of ethics, as applicable",
-            "Show initiative by leveraging organizational and time management skills to proactively seek professional opportunities for growth",
-            "Use feedback from others to improve performance",
-            "Stay current with industry standards, including best practices and technological tools within the chosen profession"
+            "Models ethical behavior and adheres to a professional code of ethics, as applicable",
+            "Shows initiative by leveraging organizational and time management skills to proactively seek professional opportunities for growth",
+            "Uses feedback from others to improve performance",
+            "Stays current with industry standards, including best practices and technological tools within the chosen profession"
         ]
     },
     es7: {
         milestone: [
-            "Engage with others who represent different perspectives on public policy and the social good through active listening, dialogue, and collaboration",
-            "Leverage knowledge of the impact of civic participation on public policy to plan for social action",
-            "Present persuasive arguments that benefit society based on reflection, analysis, and outside knowledge or perspectives"
+            "Engages with others who represent different perspectives on public policy and the social good through active listening, dialogue, and collaboration",
+            "Leverages knowledge of the impact of civic participation on public policy to plan for social action",
+            "Presents persuasive arguments that benefit society based on reflection, analysis, and outside knowledge or perspectives"
         ],
         capstone: [
-            "Assess fact-based dimensions of community-based problems to generate solutions reflecting multiple needs and perspectives",
-            "Collaborate to engage community stakeholders in civic action that targets appropriate levers for civic change",
-            "Tailor communications to elicit support for civic action in response to the needs, interests, and potential contributions of different audiences"
+            "Assesses fact-based dimensions of community-based problems to generate solutions reflecting multiple needs and perspectives",
+            "Collaborates to engage community stakeholders in civic action that targets appropriate levers for civic change",
+            "Tailors communications to elicit support for civic action in response to the needs, interests, and potential contributions of different audiences"
         ]
     },
     es8: {
         milestone: [
-            "Contribute ideas aligned to identified objectives of the team",
-            "Address conflicts constructively, communicating expectations and adjusting own behavior based on feedback",
-            "Identify tasks required to reach a goal and learns about team members' assets to support the distribution of roles and responsibilities",
-            "Adapt to changing project requirements and roles in a way that fosters mutual trust and respect"
+            "Contributes ideas aligned to identified objectives of the team",
+            "Addresses conflicts constructively, communicating expectations and adjusting own behavior based on feedback",
+            "Identifies tasks required to reach a goal and learns about team members' assets to support the distribution of roles and responsibilities",
+            "Adapts to changing project requirements and roles in a way that fosters mutual trust and respect"
         ],
         capstone: [
-            "Advocate for evidence-based solutions that promote the team's identified objectives",
-            "Foster strong team cohesion by giving and soliciting feedback and responding transparently",
-            "Collaborate with multiple teams, utilizing different perspectives and skills to achieve common goals",
-            "Navigate between leading and supporting through advocacy for mutual goals and integration of team members' strengths"
+            "Advocates for evidence-based solutions that promote the team's identified objectives",
+            "Fosters strong team cohesion by giving and soliciting feedback and responding transparently",
+            "Collaborates with multiple teams, utilizing different perspectives and skills to achieve common goals",
+            "Navigates between leading and supporting through advocacy for mutual goals and integration of team members' strengths"
         ]
     },
     es9: {
         milestone: [
-            "Apply learned knowledge to resolve foundational problems pertinent to the desired career pathway",
-            "Explain concepts that support the practical application of knowledge, skills, and abilities related to professional interests",
-            "Reflect on personal and academic experiences to assess compatibility and provide reasoning for career choice"
+            "Applies learned knowledge to resolve foundational problems pertinent to the desired career pathway",
+            "Explains concepts that support the practical application of knowledge, skills, and abilities related to professional interests",
+            "Reflects on personal and academic experiences to assess compatibility and provide reasoning for career choice"
         ],
         capstone: [
-            "Analyze and solves complex, real-world problems in the field using advanced knowledge, skills, and abilities",
-            "Integrate academic learning with hands-on experience to critically assess and solve complex challenges encountered in professional environments",
-            "Articulate a career development plan that builds on prior learning and experiences to define clear goals for achievement and continued learning after graduation"
+            "Analyzes and solves complex, real-world problems in the field using advanced knowledge, skills, and abilities",
+            "Integrates academic learning with hands-on experience to critically assess and solve complex challenges encountered in professional environments",
+            "Articulates a career development plan that builds on prior learning and experiences to define clear goals for achievement and continued learning after graduation"
         ]
     },
     es10: {
         milestone: [
-            "Develop questions with the appropriate scope for the field",
-            "Implement search strategies to find information using credible resources relevant to the field",
-            "Analyze strengths and weaknesses of information sources to identify elements of bias, expertise, and point of view",
-            "Identify connections between relevant sources to make a decision"
+            "Develops questions with the appropriate scope for the field",
+            "Implements search strategies to find information using credible resources relevant to the field",
+            "Analyzes strengths and weaknesses of information sources to identify elements of bias, expertise, and point of view",
+            "Identifies connections between relevant sources to make a decision"
         ],
         capstone: [
-            "Articulate questions informed by key concepts, relevant terminology, and related questions in the field",
-            "Execute well-developed search strategies that consider all available resources and revises the strategy as necessary",
-            "Critique information sources to thoroughly evaluate bias, expertise, point of view, and relevance and currency to the field",
-            "Synthesize patterns across sources, excluding irrelevant information to draw conclusions and reach informed decisions",
-            "Attribute ethically accessed information consistently using conventions appropriate to the field"
+            "Articulates questions informed by key concepts, relevant terminology, and related questions in the field",
+            "Executes well-developed search strategies that consider all available resources and revises the strategy as necessary",
+            "Critiques information sources to thoroughly evaluate bias, expertise, point of view, and relevance and currency to the field",
+            "Synthesizes patterns across sources, excluding irrelevant information to draw conclusions and reach informed decisions",
+            "Attributes ethically accessed information consistently using conventions appropriate to the field"
         ]
     }
 };
@@ -703,9 +776,30 @@ const rubricIndicators = {
 function getRubricLevel(mastery) {
     return mastery === 'M' ? 'capstone' : 'milestone';
 }
-function getRubricLevelLabel(mastery) {
-    return mastery === 'M' ? 'Capstone' : 'Milestone';
-}
+
+// ============================================================
+// CPE PERFORMANCE LEVEL FRAMING
+// Maps curriculum-map level (I/R/M) to the CPE achievement
+// levels (Benchmark / Milestone / Capstone) as a trajectory
+// rather than a fixed status.
+// ============================================================
+const cbinFraming = {
+    I: {
+        badge: "Benchmark → Milestone",
+        lead: "Because your course <strong>introduces</strong> this skill, students are typically entering around the <strong>Benchmark</strong> level — beginning to acquire the skill, often with guidance or support — and working toward the <strong>Milestone</strong> expectations below. Students are not expected to demonstrate these independently yet. The indicators describe what your course is building toward.",
+        indicatorLead: "Milestone indicators your course is building students toward:"
+    },
+    R: {
+        badge: "Milestone",
+        lead: "Because your course <strong>reinforces</strong> this skill, students are working at the <strong>Milestone</strong> level, where the expectation is that they demonstrate competence independently. The indicators below describe what students should be able to do with decreasing support.",
+        indicatorLead: "Milestone indicators students should be demonstrating:"
+    },
+    M: {
+        badge: "Capstone",
+        lead: "Because students are expected to <strong>master</strong> this skill in your course, they are working at the <strong>Capstone</strong> level, where the expectation is that they apply the competency with expertise and precision. The indicators below describe what graduates should be able to demonstrate.",
+        indicatorLead: "Capstone indicators students should be demonstrating:"
+    }
+};
 
 // ============================================================
 // MASTERY INFO
@@ -745,12 +839,12 @@ const bloomsLevels = [
 // Alignment hints
 const alignmentHints = {
     I: "Courses that <strong>introduce</strong> a skill typically have outcomes at the <em>Recall & Explain</em> or <em>Apply & Implement</em> level. Students are building foundational understanding, so it's natural for outcomes to focus on recognizing, explaining, or practicing the skill in structured contexts.",
-    R: "Courses that <strong>reinforce</strong> a skill typically have outcomes at the <em>Apply & Implement</em>, <em>Analyze & Examine</em>, or <em>Evaluate & Justify</em> level. Students should be moving beyond basic recall and beginning to use the skill more independently and in varied contexts.",
+    R: "Courses that <strong>build on</strong> a skill typically have outcomes at the <em>Apply & Implement</em>, <em>Analyze & Examine</em>, or <em>Evaluate & Justify</em> level. Students should be moving beyond basic recall and beginning to use the skill more independently and in varied contexts.",
     M: "Courses where students are expected to <strong>master</strong> a skill typically have outcomes at the <em>Evaluate & Justify</em> or <em>Create & Design</em> level. At this stage, students should be demonstrating the skill with sophistication, often in authentic or professional scenarios."
 };
 
 // ============================================================
-// ASSESSMENT DATA — now with mastery-aware application notes
+// ASSESSMENT DATA — mastery-aware application notes
 // ============================================================
 const assessments = {
     remember: [
@@ -760,8 +854,8 @@ const assessments = {
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id][getRubricLevel(m)];
               return m === 'M'
-                  ? `At the mastered level, the rubric expects students to do more than recall — for example, "${ind[0].toLowerCase()}." If your assessments focus primarily on recall, consider whether they capture the depth this level requires.`
-                  : `At this level, the rubric expects students to build toward competencies like "${ind[0].toLowerCase()}." Knowledge checks can confirm students have the foundational understanding to get there.`;
+                  ? `At this level of the skill, the rubric expects students to do more than recall — for example, "${ind[0].toLowerCase()}." If your assessments focus primarily on recall, consider whether they capture the depth this level requires.`
+                  : `At this stage, the rubric expects students to build toward competencies like "${ind[0].toLowerCase()}." Knowledge checks can confirm students have the foundational understanding to get there.`;
           }
         },
         { title:"Concept Mapping",
@@ -788,7 +882,7 @@ const assessments = {
               const ind = rubricIndicators[sk.id][getRubricLevel(m)];
               return m === 'I'
                   ? `Present a scenario where ${sk.context} must be applied and provide guiding questions. The rubric expects students at this stage to "${ind[0].toLowerCase()}" — your case study can scaffold toward this.`
-                  : `Present a scenario requiring ${sk.context}. At the reinforced level, reduce scaffolding — the rubric expects students to "${ind[0].toLowerCase()}" with increasing independence.`;
+                  : `Present a scenario requiring ${sk.context}. At this stage, reduce scaffolding — the rubric expects students to "${ind[0].toLowerCase()}" with increasing independence.`;
           }
         },
         { title:"Problem-Based Exercises",
@@ -817,7 +911,7 @@ const assessments = {
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id][getRubricLevel(m)];
               const relevant = ind.find(i => i.toLowerCase().includes('perspective') || i.toLowerCase().includes('analyz') || i.toLowerCase().includes('differentiat')) || ind[0];
-              return `Have students compare two or more approaches to ${sk.context} within your discipline. The rubric expects students at this level to "${relevant.toLowerCase()}" — a comparative analysis is a natural way to demonstrate this.`;
+              return `Have students compare two or more approaches to ${sk.context} within your discipline. The rubric expects students at this stage to "${relevant.toLowerCase()}" — a comparative analysis is a natural way to demonstrate this.`;
           }
         },
         { title:"Data or Source Interpretation",
@@ -866,7 +960,7 @@ const assessments = {
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id][getRubricLevel(m)];
               return m === 'M'
-                  ? `Present a complex, discipline-relevant scenario and ask students to evaluate the situation, weigh multiple options, and produce a justified recommendation. At the mastered level, the rubric expects students to "${ind[0].toLowerCase()}" — this assessment type maps directly to that expectation.`
+                  ? `Present a complex, discipline-relevant scenario and ask students to evaluate the situation, weigh multiple options, and produce a justified recommendation. At this level of skill development, the rubric expects students to "${ind[0].toLowerCase()}" — this assessment type maps directly to that expectation.`
                   : `Present a discipline-relevant scenario and ask students to evaluate the situation, consider options, and recommend an approach grounded in principles of ${sk.context}.`;
           }
         }
@@ -877,7 +971,7 @@ const assessments = {
           details:"Creative projects should have clear parameters and assessment criteria even though the final product is original. Provide enough structure to ensure rigor while leaving room for student creativity and disciplinary application.",
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id].capstone;
-              return `Assign a project where students design or produce something original that demonstrates mastery of ${sk.context}. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — an original project is one of the most authentic ways to assess this.`;
+              return `Assign a project where students design or produce something original that demonstrates expertise in ${sk.context}. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — an original project is one of the most authentic ways to assess this.`;
           }
         },
         { title:"Portfolio with Reflective Commentary",
@@ -885,15 +979,15 @@ const assessments = {
           details:"Portfolios are powerful for skills that develop over time. The reflective component is key — it's where students demonstrate they can not only perform the skill but understand their own development.",
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id].capstone;
-              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The capstone rubric expects students to "${ind[ind.length-1].toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
+              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
           }
         },
-        { title:"Capstone or Culminating Experience",
+        { title:"Culminating Experience",
           desc:"Students undertake a substantial, integrative project that requires them to synthesize learning from across the curriculum.",
-          details:"Capstone experiences should require students to independently draw on and integrate multiple skills and knowledge areas. They often include both a product and presentation component.",
+          details:"Culminating experiences should require students to independently draw on and integrate multiple skills and knowledge areas. They often include both a product and presentation component.",
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id].capstone;
-              return `Design a culminating experience where students independently apply ${sk.context} at a professional level. The rubric expects graduates to "${ind[0].toLowerCase()}" — a capstone experience allows students to demonstrate this through a substantial, integrative project.`;
+              return `Design a culminating experience where students independently apply ${sk.context} at a professional level. The rubric expects graduates to "${ind[0].toLowerCase()}" — a substantial, integrative project allows students to demonstrate this.`;
           }
         },
         { title:"Professional Presentation or Publication",
@@ -921,7 +1015,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a scenario involving an interpersonal challenge — a workplace misunderstanding, a team disagreement, or a cross-cultural interaction — and provide guiding questions that help students apply principles of effective interpersonal communication to propose a response."
-                : "Present an interpersonal challenge scenario and ask students to apply interaction strategies with less scaffolding. At this level, students should be able to independently identify positive ways to interact and explain the reasoning behind their approach.",
+                : "Present an interpersonal challenge scenario and ask students to apply interaction strategies with less scaffolding. At this stage, students should be able to independently identify positive ways to interact and explain the reasoning behind their approach.",
             (sk,m) => "Give students a series of interpersonal scenarios — a difficult conversation with a colleague, navigating disagreement in a group, responding to constructive feedback — and ask them to practice applying specific interaction strategies, explaining their reasoning for each choice.",
             (sk,m) => "This is where this skill comes alive. Have students role-play interpersonal scenarios — a challenging workplace conversation, a cross-perspective dialogue, or a collaborative decision-making situation — and debrief afterward about what they noticed about their own communication patterns and assumptions.",
             (sk,m) => "Ask students to demonstrate effective interpersonal skills in a structured interaction — such as an active listening exercise, a perspective-taking conversation, or a collaborative problem-solving session — using a clear rubric that identifies the specific behaviors you're looking for."
@@ -934,7 +1028,7 @@ const skillSpecificApps = {
         ],
         evaluate: [
             (sk,m) => m==='M'
-                ? "Have students observe or review a recorded interpersonal interaction (a negotiation, a team meeting, a difficult conversation) and evaluate its effectiveness using criteria tied to self-awareness, perspective-taking, and respectful communication. At the mastered level, students should be able to develop and apply their own evaluation criteria."
+                ? "Have students observe or review a recorded interpersonal interaction (a negotiation, a team meeting, a difficult conversation) and evaluate its effectiveness using criteria tied to self-awareness, perspective-taking, and respectful communication. At this stage, students should be able to develop and apply their own evaluation criteria."
                 : "Have students observe or review an interpersonal interaction and evaluate its effectiveness using criteria you provide — focused on self-awareness, perspective-taking, and respectful communication. Alternatively, have students give and receive structured peer feedback on their own interpersonal skills during a collaborative exercise.",
             (sk,m) => "Assign a paper where students take a position on a question related to interpersonal effectiveness — for example, whether a particular approach to conflict resolution is effective, or how self-awareness should be prioritized in professional interactions — and defend their position with evidence from course concepts and their own experience.",
             (sk,m) => "Ask students to develop criteria for evaluating the quality of interpersonal interactions in a professional context relevant to their discipline. What distinguishes someone who interacts effectively with others from someone who doesn't? What observable behaviors would you look for?",
@@ -957,7 +1051,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a scenario where a team or organization faces unexpected change — a shift in project scope, a resource loss, a new directive — and provide guiding questions that help students apply leadership and adaptability principles to develop a response plan."
-                : "Present a change scenario and ask students to develop a response with less scaffolding. At this level, students should be practicing how to adjust to new situations independently and encourage others to persist through the transition.",
+                : "Present a change scenario and ask students to develop a response with less scaffolding. At this stage, students should be practicing how to adjust to new situations independently and encourage others to persist through the transition.",
             (sk,m) => "Give students a series of scenarios involving change and uncertainty, and ask them to practice responding with specific adaptive strategies — adjusting plans, re-motivating a discouraged team, or pivoting approaches when initial solutions don't work.",
             (sk,m) => "Simulate a situation where conditions change mid-task — reassign roles, alter the parameters, introduce new constraints — and ask students to lead their peers through the adjustment. Debrief afterward about how they adapted and what they noticed about group dynamics during the transition.",
             (sk,m) => "Ask students to demonstrate adaptive leadership in a structured exercise — leading a group through a problem-solving activity where conditions shift partway through, showing they can adjust their approach while supporting others."
@@ -970,7 +1064,7 @@ const skillSpecificApps = {
         ],
         evaluate: [
             (sk,m) => m==='M'
-                ? "Have students evaluate a leadership scenario and assess the leader's effectiveness in navigating change. At the mastered level, students should apply sophisticated judgment — recognizing that effective adaptive leadership involves anticipating change, modeling new strategies, and coaching others through transitions."
+                ? "Have students evaluate a leadership scenario and assess the leader's effectiveness in navigating change. At this stage, students should apply sophisticated judgment — recognizing that effective adaptive leadership involves anticipating change, modeling new strategies, and coaching others through transitions."
                 : "Have students observe a leadership scenario (live, recorded, or described in a case study) and evaluate the leader's effectiveness in navigating change, using criteria related to adaptability, communication, and supporting others.",
             (sk,m) => "Assign a paper where students take and defend a position on a leadership or adaptability question relevant to their discipline — for example, whether a particular change management approach is effective, or what role coaching plays in helping others adapt to new circumstances.",
             (sk,m) => "Ask students to develop criteria for evaluating effective adaptive leadership. What does it look like when someone leads well through change? What behaviors, decisions, and communication patterns distinguish effective adaptation from reactive scrambling?",
@@ -993,7 +1087,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a professional scenario involving an ethical dilemma, a time management challenge, or an accountability question, and provide guiding questions that help students apply professional principles to determine an appropriate course of action."
-                : "Present professional scenarios and ask students to apply professional standards with increasing independence. At this level, the rubric expects students to make ethical choices, manage priorities, and take accountability for their actions.",
+                : "Present professional scenarios and ask students to apply professional standards with increasing independence. At this stage, the rubric expects students to make ethical choices, manage priorities, and take accountability for their actions.",
             (sk,m) => "Give students a series of realistic professional challenges — meeting competing deadlines, responding to an ethical gray area, handling a mistake, giving and receiving feedback — and ask them to practice applying professional standards to each, explaining their reasoning.",
             (sk,m) => "Simulate a professional situation where students must demonstrate professional behavior — managing a project timeline, responding to an ethical concern, or handling constructive feedback. Debrief afterward about what professional choices they made and why.",
             (sk,m) => "Ask students to demonstrate professionalism through a structured task — completing a project with professional-quality deliverables, meeting deadlines, using field-appropriate terminology, and responding to feedback. Use a rubric that assesses the professional behaviors, not just the content."
@@ -1006,7 +1100,7 @@ const skillSpecificApps = {
         ],
         evaluate: [
             (sk,m) => m==='M'
-                ? "Have students evaluate professional work products — their own or their peers' — against professional standards in their field. At the mastered level, students should be modeling ethical behavior and using feedback to improve their own performance, so peer evaluation becomes both an assessment of professionalism and a demonstration of it."
+                ? "Have students evaluate professional work products — their own or their peers' — against professional standards in their field. At this stage, students should be modeling ethical behavior and using feedback to improve their own performance, so peer evaluation becomes both an assessment of professionalism and a demonstration of it."
                 : "Have students evaluate professional work products or conduct — their own or their peers' — against professional standards in their field. This could include assessing the quality, timeliness, and ethical integrity of deliverables, and providing constructive feedback.",
             (sk,m) => "Assign a paper where students take and defend a position on a professional or ethical question relevant to their discipline — for example, how to handle a specific ethical dilemma, what constitutes professional accountability in a given context, or how industry standards should evolve.",
             (sk,m) => "Ask students to develop criteria for evaluating professionalism in their field. What behaviors distinguish a highly professional practitioner from one who is merely adequate? What role do ethics, initiative, and accountability play?",
@@ -1029,7 +1123,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a scenario involving a team facing a collaboration challenge — unequal contribution, role confusion, or communication breakdowns — and provide guiding questions that help students apply teamwork principles to propose solutions."
-                : "Design team-based activities where students must work through real collaborative challenges. At this level, the rubric expects students to contribute ideas aligned to team objectives and address conflicts constructively — the exercise should create genuine opportunities for both.",
+                : "Design team-based activities where students must work through real collaborative challenges. At this stage, the rubric expects students to contribute ideas aligned to team objectives and address conflicts constructively — the exercise should create genuine opportunities for both.",
             (sk,m) => "Design team-based exercises where students must work through a structured problem together, practicing specific collaboration skills like role negotiation, task distribution, and constructive feedback. The problem should require genuine interdependence rather than parallel individual work.",
             (sk,m) => "Place students in a simulated team scenario where they must navigate a collaborative challenge — assign roles with competing priorities, introduce a conflict that must be resolved, or require consensus on a difficult decision. Debrief about what collaboration strategies they used and what they would do differently.",
             (sk,m) => "Ask students to demonstrate effective team collaboration through a structured group task — with clear assessment of both the team's process (communication, role distribution, conflict management) and their product, using criteria that value collaboration as much as the final output."
@@ -1042,7 +1136,7 @@ const skillSpecificApps = {
         ],
         evaluate: [
             (sk,m) => m==='M'
-                ? "Have students evaluate their team's collaborative process using structured peer evaluation that assesses contribution, communication, adaptability, and conflict management. At the mastered level, the rubric expects students to foster team cohesion by giving and soliciting feedback — peer evaluation becomes both the assessment and the demonstration of the skill."
+                ? "Have students evaluate their team's collaborative process using structured peer evaluation that assesses contribution, communication, adaptability, and conflict management. At this stage, the rubric expects students to foster team cohesion by giving and soliciting feedback — peer evaluation becomes both the assessment and the demonstration of the skill."
                 : "Have students evaluate their team's collaborative process — using structured peer evaluation that assesses contribution, communication, adaptability, and conflict management. Alternatively, have teams evaluate case studies of other teams' collaborative practices using defined criteria.",
             (sk,m) => "Assign a paper where students take and defend a position on a teamwork or collaboration question relevant to their discipline — for example, what the most important factor in team success is, how to handle specific collaborative challenges, or what distinguishes functional from dysfunctional teams.",
             (sk,m) => "Ask students to create criteria for evaluating effective collaboration. What observable behaviors indicate a team is working well together? How would you assess individual contribution to a team effort without simply counting outputs?",
@@ -1126,12 +1220,12 @@ function getAlignmentMessage(mastery, blooms) {
     }
     if (mastery === 'I' && (blooms === 'evaluate' || blooms === 'create')) {
         return { icon:"💡", title:"Something to Consider",
-            msg:`Your course <strong>introduces</strong> this skill, but the outcomes you described align with a higher cognitive level (<em>${level.title}</em>). This isn't necessarily a problem — but it's worth checking whether your learning outcomes reflect the introductory nature of the course. If your outcomes use advanced verbs like "evaluate" or "create," your course may actually be reinforcing or building toward mastery. The assessments below are tailored to your selection, but you might also explore what the <em>Reinforced</em> or <em>Mastered</em> level suggests.`
+            msg:`Your course <strong>introduces</strong> this skill, but the outcomes you described align with a higher cognitive level (<em>${level.title}</em>). This isn't necessarily a problem — but it's worth checking whether your learning outcomes reflect the introductory nature of the course. If your outcomes use advanced verbs like "evaluate" or "create," your course may actually be building on the skill or moving students toward independent demonstration. The assessments below are tailored to your selection, but you might also explore what the other course levels suggest.`
         };
     }
     if (mastery === 'M' && (blooms === 'remember' || blooms === 'apply')) {
         return { icon:"💡", title:"Something to Consider",
-            msg:`Your course expects students to <strong>master</strong> this skill, but the outcomes you described align with a foundational cognitive level (<em>${level.title}</em>). Mastery typically involves higher-order thinking like evaluation, judgment, or original creation. It may be worth reviewing whether your learning outcomes fully capture the depth of what you expect students to demonstrate. The assessments below match your selection, but you may also want to see what <em>Evaluate & Justify</em> or <em>Create & Design</em> level options look like.`
+            msg:`Your course expects students to demonstrate a high level of expertise with this skill, but the outcomes you described align with a foundational cognitive level (<em>${level.title}</em>). Deeper skill development typically involves higher-order thinking like evaluation, judgment, or original creation. It may be worth reviewing whether your learning outcomes fully capture the depth of what you expect students to demonstrate. The assessments below match your selection, but you may also want to see what <em>Evaluate & Justify</em> or <em>Create & Design</em> level options look like.`
         };
     }
     return { icon:"📝", title:"A Note on Alignment",
@@ -1142,7 +1236,7 @@ function getAlignmentMessage(mastery, blooms) {
 function getWatchout(mastery, blooms) {
     const tips = [];
     if (mastery === 'M') {
-        tips.push("At the <strong>Mastered</strong> level, assessments should require students to demonstrate the skill independently, in authentic or complex contexts. If your current assessments provide significant scaffolding (step-by-step instructions, templates, fill-in-the-blank formats), they may be assessing at a lower level than intended.");
+        tips.push("At this stage, assessments should require students to demonstrate the skill independently, in authentic or complex contexts. If your current assessments provide significant scaffolding (step-by-step instructions, templates, fill-in-the-blank formats), they may be assessing at a lower level than intended.");
     }
     if (mastery === 'I') {
         tips.push("When a skill is being <strong>introduced</strong>, students benefit from lower-stakes assessments with clear expectations and supportive feedback. If your current assessments penalize students heavily for incomplete mastery of a skill they're just encountering, consider adjusting the weight or format.");
@@ -1153,6 +1247,10 @@ function getWatchout(mastery, blooms) {
     if (blooms === 'remember') {
         tips.push("If your assessments focus primarily on recall (multiple choice, matching, definitions), they may not fully capture whether students understand the concepts well enough to use them. Consider adding at least one assessment that asks students to <strong>explain</strong> or <strong>apply</strong> what they know.");
     }
+    if (state.secondarySkill) {
+        const sec = skills.find(s => s.id === state.secondarySkill);
+        if (sec) tips.push(`Because this course also addresses <strong>${sec.name}</strong>, look for opportunities to design one assignment that generates authentic evidence for both skills rather than adding a separate assignment. Be sure your rubric makes both sets of expectations visible to students, or they may only attend to one.`);
+    }
     tips.push("Review your learning outcomes alongside your assessments. The verbs in your outcomes (describe, analyze, create, etc.) signal what students should be able to <strong>do</strong>. Your assessments should give students the opportunity to <em>demonstrate those specific actions</em>. If there's a gap, the most actionable fix is usually adjusting the assessment rather than rewriting the outcome.");
     return tips;
 }
@@ -1160,7 +1258,7 @@ function getWatchout(mastery, blooms) {
 // ============================================================
 // STATE & NAVIGATION
 // ============================================================
-const state = { screen:'welcome', skill:null, mastery:null, blooms:null };
+const state = { screen:'welcome', skill:null, secondarySkill:null, mastery:null, blooms:null };
 
 function goToScreen(id) {
     if (id === 'mastery-screen' && state.skill) {
@@ -1209,11 +1307,32 @@ function renderSkillCards() {
     });
 }
 
+function renderSecondarySkillOptions() {
+    const sel = document.getElementById('secondary-skill');
+    if (!sel) return;
+    const current = state.secondarySkill || '';
+    sel.innerHTML = '<option value="">No — focus on my primary skill only</option>';
+    skills.filter(sk => sk.id !== state.skill).forEach(sk => {
+        const opt = document.createElement('option');
+        opt.value = sk.id;
+        opt.textContent = `ES${sk.num}: ${sk.name}`;
+        sel.appendChild(opt);
+    });
+    sel.value = current;
+}
+
+function setSecondarySkill(value) {
+    state.secondarySkill = value || null;
+}
+
 function selectSkill(id) {
     document.querySelectorAll('.skill-card').forEach(c=>c.classList.remove('selected'));
     document.querySelector(`[data-skill="${id}"]`).classList.add('selected');
     state.skill = id; state.mastery = null; state.blooms = null;
+    if (state.secondarySkill === id) state.secondarySkill = null;
     document.getElementById('skill-next').disabled = false;
+    document.getElementById('secondary-skill-box').style.display = 'block';
+    renderSecondarySkillOptions();
     document.querySelectorAll('.mastery-card').forEach(c=>c.classList.remove('selected'));
     document.getElementById('mastery-next').disabled = true;
     document.getElementById('blooms-next').disabled = true;
@@ -1264,28 +1383,59 @@ function selectBlooms(id) {
 }
 
 // ============================================================
+// CPE / RUBRIC CONTEXT
+// ============================================================
+function renderCbinContext() {
+    const skill = skills.find(s=>s.id===state.skill);
+    const rl = getRubricLevel(state.mastery);
+    const indicators = rubricIndicators[skill.id][rl];
+    const f = cbinFraming[state.mastery];
+    const el = document.getElementById('cbin-context');
+
+    let secondaryLine = '';
+    if (state.secondarySkill) {
+        const sec = skills.find(s=>s.id===state.secondarySkill);
+        const secIndicators = rubricIndicators[sec.id][rl];
+        secondaryLine = `
+            <p style="margin-top:14px;"><span class="cbin-indicator-lead">Because this course also addresses ES${sec.num}: ${sec.name}, these indicators apply as well:</span></p>
+            <ul>${secIndicators.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+    }
+
+    el.innerHTML = `
+        <div class="cbin-level-badge">CPE Performance Level: ${f.badge}</div>
+        <h4>Where Your Course Falls in the KGP Progression</h4>
+        <p>${f.lead}</p>
+        <p style="margin-top:14px;"><span class="cbin-indicator-lead">${f.indicatorLead}</span></p>
+        <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
+        ${secondaryLine}
+        <p style="margin-top:12px;font-size:12.5px;color:var(--text-light);">CPE's Graduate Profile rubrics describe three levels of achievement: <strong>Benchmark</strong> (beginning to acquire the skill, often with guidance), <strong>Milestone</strong> (demonstrating competence independently), and <strong>Capstone</strong> (applying the competency with expertise and precision). Use these indicators to check whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with this level and with the cognitive level you selected.</p>
+    `;
+}
+
+// ============================================================
 // STEP 4: RESULTS
 // ============================================================
 function showResults() {
     const skill = skills.find(s=>s.id===state.skill);
     const bloom = bloomsLevels.find(b=>b.id===state.blooms);
-    const rl = getRubricLevel(state.mastery);
-    const indicators = rubricIndicators[skill.id][rl];
 
     // Summary
     document.getElementById('result-skill').textContent = `ES${skill.num}: ${skill.name}`;
     document.getElementById('result-mastery').textContent = masteryInfo[state.mastery].full;
+    document.getElementById('result-cbin').textContent = cbinFraming[state.mastery].badge;
     document.getElementById('result-blooms').textContent = `${bloom.title} (${bloom.tag})`;
 
-    // Rubric context
-    const rubricBox = document.getElementById('rubric-context');
-    const levelWord = state.mastery === 'M' ? 'mastered' : (state.mastery === 'R' ? 'reinforced' : 'introduced');
-    rubricBox.innerHTML = `
-        <h4>What the Rubric Expects at This Level</h4>
-        <p>According to the CPE's performance indicators, students at the <strong>${getRubricLevelLabel(state.mastery)}</strong> level for this skill should be able to:</p>
-        <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
-        <p style="margin-top:10px;font-size:12.5px;color:var(--text-light);">These indicators can help you evaluate whether your current assessments are capturing what the rubric expects. The suggestions below are designed to align with both this rubric level and the cognitive level you selected.</p>
-    `;
+    const secRow = document.getElementById('result-secondary-row');
+    if (state.secondarySkill) {
+        const sec = skills.find(s=>s.id===state.secondarySkill);
+        document.getElementById('result-secondary').textContent = `ES${sec.num}: ${sec.name}`;
+        secRow.style.display = 'flex';
+    } else {
+        secRow.style.display = 'none';
+    }
+
+    // CPE rubric context
+    renderCbinContext();
 
     // Alignment
     const align = getAlignmentMessage(state.mastery, state.blooms);
@@ -1336,11 +1486,15 @@ function showResults() {
 // RESTART
 // ============================================================
 function restartTool() {
-    state.skill=null; state.mastery=null; state.blooms=null;
+    state.skill=null; state.secondarySkill=null; state.mastery=null; state.blooms=null;
     document.querySelectorAll('.skill-card,.mastery-card,.blooms-card').forEach(c=>c.classList.remove('selected'));
     document.getElementById('skill-next').disabled=true;
     document.getElementById('mastery-next').disabled=true;
     document.getElementById('blooms-next').disabled=true;
+    const secSel = document.getElementById('secondary-skill');
+    if (secSel) secSel.value = '';
+    document.getElementById('secondary-skill-box').style.display = 'none';
+    document.getElementById('result-secondary-row').style.display = 'none';
     goToScreen('welcome-screen');
 }
 
@@ -1348,6 +1502,7 @@ function restartTool() {
 // INIT
 // ============================================================
 renderSkillCards();
+renderSecondarySkillOptions();
 updateProgress();
 </script>
 </body>
