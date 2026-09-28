@@ -894,7 +894,7 @@ const assessments = {
               const ind = rubricIndicators[sk.id][getRubricLevel(m)];
               return m === 'I'
                   ? `Present a scenario where ${sk.context} must be applied and provide guiding questions. The rubric expects students at this stage to "${ind[0].toLowerCase()}" — your case study can scaffold toward this.`
-                  : `Present a scenario requiring ${sk.context}. At this stage, reduce scaffolding — the rubric expects students to "${ind[0].toLowerCase()}" with increasing independence.`;
+                  : `Present a scenario requiring ${sk.context} and give students the situation without guiding questions, so they have to decide for themselves what the problem calls for. The rubric expects students to "${ind[0].toLowerCase()}" on their own at this stage.`;
           }
         },
         { title:"Problem-Based Exercises",
@@ -1028,7 +1028,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a realistic workplace communication scenario, such as explaining a delay to a supervisor or a technical concept to a client, and provide guiding questions or a structure students can follow as they draft the message and explain their choices."
-                : "Present a workplace communication scenario and ask students to draft the message with less scaffolding. At this stage the expectation is that students write with logical structure and sound conventions on their own, and can explain why they made the choices they did.",
+                : "Present a workplace communication scenario and give students the situation and the audience, but not a template or a set of guiding questions. At this stage the expectation is that students structure the message themselves, apply the conventions on their own, and explain the choices they made.",
             (sk,m) => "Assign short, repeated writing tasks that hold the content constant and vary the audience. Asking students to explain the same finding to a specialist, a supervisor, and a general reader makes audience adaptation visible and practicable rather than abstract.",
             (sk,m) => "This is where the listening side of this skill can actually be assessed. Set up structured interviews, intake conversations, or team meetings where students must give focused attention, ask clarifying questions, and respond to what was said. Debrief afterward about what they heard and what they missed.",
             (sk,m) => "Ask students to deliver a short presentation or conduct a professional conversation, assessed with a rubric that names delivery, organization, evidence use, and audience adaptation separately, so students can see which part of the performance needs work."
@@ -1064,7 +1064,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a problem scenario from the discipline with guiding questions that walk students through defining the problem, locating relevant information, and proposing an approach. The scaffolding should make the reasoning steps visible."
-                : "Present a problem scenario with reduced scaffolding and ask students to define the problem themselves, find relevant sources, and propose an approach. At this stage students should be identifying the aspects of a problem and seeking out different perspectives without being prompted to do so.",
+                : "Present a problem scenario without guiding questions and ask students to define the problem themselves, find relevant sources, and propose an approach. At this stage students should be identifying the aspects of a problem and seeking out different perspectives without being prompted to do so.",
             (sk,m) => "Assign ill-structured problems that have more than one defensible solution. Require students to state their assumptions and explain why they chose their approach, since the reasoning is the evidence here, not the answer.",
             (sk,m) => "Run a structured idea-generation session with real constraints, such as a design sprint or a rapid prototyping exercise, and then require students to test their ideas against evidence. This is where the creative half of the skill becomes assessable rather than assumed.",
             (sk,m) => "Ask students to work a problem aloud or in writing, showing each reasoning step rather than only the conclusion. Assess whether the steps hold together, which is often where the gap between a right answer and sound thinking shows up."
@@ -1136,9 +1136,9 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a community problem scenario with guiding questions that help students identify the stakeholders, the decision-making body, and one plausible action step. Scaffolding matters here because most students have never traced a civic process before."
-                : "Present a community problem and ask students to identify the relevant decision-makers and propose an action step with less guidance. At this stage the expectation is that students can use what they know about civic participation to plan a course of social action.",
+                : "Present a community problem and ask students to determine on their own who the relevant decision-makers are and what action step would reach them. At this stage the expectation is that students can use what they know about civic participation to plan a course of social action, rather than being walked through the process.",
             (sk,m) => "Ask students to draft a plan for addressing a local issue that names the specific decision-maker, the appropriate lever, and the evidence they would bring. Vague calls to raise awareness should not satisfy the assignment.",
-            (sk,m) => "Run a mock public hearing, council meeting, or stakeholder negotiation in which students represent assigned positions and must listen and respond to competing interests in real time. This is where engaging with different perspectives through dialogue becomes observable.",
+            (sk,m) => "Run a mock public hearing, council meeting, or stakeholder negotiation in which students represent assigned positions and must listen and respond to competing interests. This is where engaging with different perspectives through dialogue becomes observable. In an online course, a threaded role-play with required responses to opposing positions serves the same purpose.",
             (sk,m) => "Ask students to deliver a short advocacy message to a specified audience, assessed on whether the appeal is fitted to that audience's interests and concerns rather than to the student's own."
         ],
         analyze: [
@@ -1172,7 +1172,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present an entry-level professional problem with guiding questions that help students apply what they have learned to resolve it. Keeping the problem foundational is appropriate here and matches what the rubric expects at this stage."
-                : "Present a professional problem and ask students to resolve it with less scaffolding, explaining which concepts they drew on and why. At this stage the expectation is that students apply learned knowledge to foundational problems relevant to their intended career pathway.",
+                : "Present a professional problem without specifying which course concepts apply, and ask students to determine that themselves and explain their reasoning. At this stage the expectation is that students apply learned knowledge to foundational problems relevant to their intended career pathway.",
             (sk,m) => "Assign authentic tasks drawn from practice, the kind of work a new hire would actually be handed in the first months. The closer the task is to real professional work, the more directly it generates evidence for this skill.",
             (sk,m) => "Run a workplace simulation in which students take on a professional role and work a realistic task under realistic constraints, including incomplete information and a deadline.",
             (sk,m) => "Ask students to perform a discipline-specific professional task to the standard a practitioner would be held to, using a rubric drawn from field expectations rather than course expectations."
@@ -1208,9 +1208,9 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a decision scenario with guiding questions that walk students through locating sources and justifying which ones they would rely on. Making the search process explicit matters more here than the sources they land on."
-                : "Present a decision scenario and ask students to locate and justify their sources with less guidance. At this stage the expectation is that students implement search strategies using credible resources relevant to the field.",
+                : "Present a decision scenario without naming source types or starting points, and ask students to locate and justify their own sources. At this stage the expectation is that students implement search strategies using credible resources relevant to the field.",
             (sk,m) => "Ask students to turn a vague topic into a question with appropriate scope for the field, then carry out and document a search against it. Scoping the question is the step most students skip and the one the rubric names first.",
-            (sk,m) => "Run a time-boxed search challenge in which students find the best available evidence on a question and defend their choice. Working under constraint surfaces search habits that an untimed assignment will not.",
+            (sk,m) => "Run a search challenge with a tight limit on time or number of sources, and ask students to find the best available evidence on a question and defend their choice. Working under constraint surfaces search habits that an open-ended assignment will not, and the limit works as well in an online setting as in a classroom.",
             (sk,m) => "Ask students to submit a documented search strategy along with their results, including the terms they used, what they revised, and why. The strategy is the demonstrable skill; the sources are the byproduct."
         ],
         analyze: [
@@ -1244,7 +1244,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a scenario involving an interpersonal challenge — a workplace misunderstanding, a team disagreement, or a cross-cultural interaction — and provide guiding questions that help students apply principles of effective interpersonal communication to propose a response."
-                : "Present an interpersonal challenge scenario and ask students to apply interaction strategies with less scaffolding. At this stage, students should be able to independently identify positive ways to interact and explain the reasoning behind their approach.",
+                : "Present an interpersonal challenge scenario and ask students to determine an approach on their own, without prompts pointing them toward particular strategies. At this stage, students should be able to independently identify positive ways to interact and explain the reasoning behind their approach.",
             (sk,m) => "Give students a series of interpersonal scenarios — a difficult conversation with a colleague, navigating disagreement in a group, responding to constructive feedback — and ask them to practice applying specific interaction strategies, explaining their reasoning for each choice.",
             (sk,m) => "This is where this skill comes alive. Have students role-play interpersonal scenarios — a challenging workplace conversation, a cross-perspective dialogue, or a collaborative decision-making situation — and debrief afterward about what they noticed about their own communication patterns and assumptions.",
             (sk,m) => "Ask students to demonstrate effective interpersonal skills in a structured interaction — such as an active listening exercise, a perspective-taking conversation, or a collaborative problem-solving session — using a clear rubric that identifies the specific behaviors you're looking for."
@@ -1280,7 +1280,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a scenario where a team or organization faces unexpected change — a shift in project scope, a resource loss, a new directive — and provide guiding questions that help students apply leadership and adaptability principles to develop a response plan."
-                : "Present a change scenario and ask students to develop a response with less scaffolding. At this stage, students should be practicing how to adjust to new situations independently and encourage others to persist through the transition.",
+                : "Present a change scenario and ask students to develop a response without guiding questions telling them what to consider. At this stage, students should be deciding for themselves how to adjust to the new situation and how to help others persist through it.",
             (sk,m) => "Give students a series of scenarios involving change and uncertainty, and ask them to practice responding with specific adaptive strategies — adjusting plans, re-motivating a discouraged team, or pivoting approaches when initial solutions don't work.",
             (sk,m) => "Simulate a situation where conditions change mid-task — reassign roles, alter the parameters, introduce new constraints — and ask students to lead their peers through the adjustment. Debrief afterward about how they adapted and what they noticed about group dynamics during the transition.",
             (sk,m) => "Ask students to demonstrate adaptive leadership in a structured exercise — leading a group through a problem-solving activity where conditions shift partway through, showing they can adjust their approach while supporting others."
@@ -1316,7 +1316,7 @@ const skillSpecificApps = {
         apply: [
             (sk,m) => m==='I'
                 ? "Present a professional scenario involving an ethical dilemma, a time management challenge, or an accountability question, and provide guiding questions that help students apply professional principles to determine an appropriate course of action."
-                : "Present professional scenarios and ask students to apply professional standards with increasing independence. At this stage, the rubric expects students to make ethical choices, manage priorities, and take accountability for their actions.",
+                : "Present professional scenarios and ask students to determine the appropriate course of action without being told which standard applies. At this stage, the rubric expects students to make ethical choices, manage priorities, and take accountability for their actions.",
             (sk,m) => "Give students a series of realistic professional challenges — meeting competing deadlines, responding to an ethical gray area, handling a mistake, giving and receiving feedback — and ask them to practice applying professional standards to each, explaining their reasoning.",
             (sk,m) => "Simulate a professional situation where students must demonstrate professional behavior — managing a project timeline, responding to an ethical concern, or handling constructive feedback. Debrief afterward about what professional choices they made and why.",
             (sk,m) => "Ask students to demonstrate professionalism through a structured task — completing a project with professional-quality deliverables, meeting deadlines, using field-appropriate terminology, and responding to feedback. Use a rubric that assesses the professional behaviors, not just the content."
