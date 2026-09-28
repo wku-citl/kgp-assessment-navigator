@@ -539,7 +539,7 @@
 
             <div class="secondary-skill-box" id="secondary-skill-box" style="display:none;">
                 <label class="secondary-skill-label" for="secondary-skill">Does this course also address another Essential Skill? <span class="optional-tag">Optional</span></label>
-                <p class="secondary-skill-hint">Courses often address more than one Essential Skill, and a well-designed assignment can generate meaningful evidence for more than one at a time. If you select a second skill, your results will include its performance indicators alongside the primary skill's.</p>
+                <p class="secondary-skill-hint">Courses often address more than one Essential Skill, and a well-designed assignment can generate meaningful evidence for more than one at a time. The assessment suggestions below are built around your primary skill; selecting a second skill adds its performance indicators so you can check your assignment against both.</p>
                 <select class="form-select" id="secondary-skill" onchange="setSecondarySkill(this.value)">
                     <option value="">No — focus on my primary skill only</option>
                 </select>
@@ -574,6 +574,18 @@
                     <p class="mastery-desc">Students demonstrate this skill with expertise and precision. The focus is on independent, sophisticated application in complex, authentic, or professional contexts.</p>
                 </div>
             </div>
+
+            <div class="secondary-skill-box" id="secondary-level-wrap" style="display:none;">
+                <label class="secondary-skill-label" for="secondary-level">And at what level does your course address <strong id="secondary-skill-name"></strong>?</label>
+                <p class="secondary-skill-hint">A course often introduces one skill while students are further along in another, so this may differ from the level you selected above.</p>
+                <select class="form-select" id="secondary-level" onchange="setSecondaryMastery(this.value)">
+                    <option value="same">Same level as my primary skill</option>
+                    <option value="I">Introduced</option>
+                    <option value="R">Reinforced</option>
+                    <option value="M">Mastered</option>
+                </select>
+            </div>
+
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="goToScreen('skill-screen')">Back</button>
                 <button class="btn btn-primary" id="mastery-next" disabled onclick="goToScreen('blooms-screen')">Continue</button>
@@ -644,131 +656,131 @@ const skills = [
 const rubricIndicators = {
     es1: {
         milestone: [
-            "Gives focused attention to others, asks clarifying questions, and shows awareness of nonverbal signals",
-            "Writes formally and informally using logical structure, complete sentences, standard grammar, and correct punctuation",
-            "Engages in formal conversations with peers and professionals by offering information and ideas"
+            "Give focused attention to others, ask clarifying questions, and show awareness of nonverbal signals",
+            "Write formally and informally using logical structure, complete sentences, standard grammar, and correct punctuation",
+            "Engage in formal conversations with peers and professionals by offering information and ideas"
         ],
         capstone: [
-            "Facilitates conversation by using active listening techniques and nonverbal signals",
-            "Tailors written communication to the audience and situation, using professional vocabulary, tone, and logically organized structure suited to the context and purpose",
-            "Prepares, structures, and delivers an oral presentation in a professional setting"
+            "Facilitate conversation by using active listening techniques and nonverbal signals",
+            "Tailor written communication to the audience and situation, using professional vocabulary, tone, and logically organized structure suited to the context and purpose",
+            "Prepare, structure, and deliver an oral presentation in a professional setting"
         ]
     },
     es2: {
         milestone: [
-            "Identifies aspects of a problem clearly by locating and using relevant sources of information",
-            "Seeks out and considers different perspectives on a problem",
-            "Articulates patterns, relationships, context, and other factors relevant to a problem",
-            "Links concepts to generate novel ideas or solutions to problems"
+            "Identify aspects of a problem clearly by locating and using relevant sources of information",
+            "Seek out and consider different perspectives on a problem",
+            "Articulate patterns, relationships, context, and other factors relevant to a problem",
+            "Link concepts to generate novel ideas or solutions to problems"
         ],
         capstone: [
-            "Analyzes a problem and its components accurately using credible sources, data, and information",
-            "Evaluates alternative perspectives, allowing new information to add depth to thinking about a problem",
-            "Evaluates reasonable implications and weighs and synthesizes significant evidence and relevant perspectives to draw informed and innovative conclusions",
-            "Integrates varied perspectives to propose an innovative idea or solution"
+            "Analyze a problem and its components accurately using credible sources, data, and information",
+            "Evaluate alternative perspectives, allowing new information to add depth to thinking about a problem",
+            "Evaluate reasonable implications and weigh and synthesize significant evidence and relevant perspectives to draw informed and innovative conclusions",
+            "Integrate varied perspectives to propose an innovative idea or solution"
         ]
     },
     es3: {
         milestone: [
-            "Illustrates contextual data using a variety of models, including equations, graphs, and tables",
-            "Applies percentages and statistics to describe contextual data",
-            "Utilizes a variety of quantitative strategies to articulate assumptions and solve problems"
+            "Illustrate contextual data using a variety of models, including equations, graphs, and tables",
+            "Apply percentages and statistics to describe contextual data",
+            "Utilize a variety of quantitative strategies to articulate assumptions and solve problems"
         ],
         capstone: [
-            "Analyzes real-world data (e.g., case studies, simulations, experiments) using appropriate quantitative and qualitative strategies",
-            "Differentiates between appropriate and inappropriate uses of statistics within real-world contexts",
-            "Applies quantitative reasoning to real-world scenarios to reach well-reasoned and data-informed conclusions"
+            "Analyze real-world data (e.g., case studies, simulations, experiments) using appropriate quantitative and qualitative strategies",
+            "Differentiate between appropriate and inappropriate uses of statistics within real-world contexts",
+            "Apply quantitative reasoning to real-world scenarios to reach well-reasoned and data-informed conclusions"
         ]
     },
     es4: {
         milestone: [
-            "Identifies how one's own perspectives and lived experiences impact relationships",
-            "Identifies positive ways to interact with people",
-            "Identifies multiple perspectives, ideas, and beliefs through interactions"
+            "Identify how one's own perspectives and lived experiences impact relationships",
+            "Identify positive ways to interact with people",
+            "Identify multiple perspectives, ideas, and beliefs through interactions"
         ],
         capstone: [
-            "Articulates insights into one's own perspectives and lived experiences that create openness to positive interactions with others",
-            "Creates positive interactions with people",
-            "Engages effectively with individuals by applying insights about one's own perspectives and beliefs to relate to others and bridge differences"
+            "Articulate insights into one's own perspectives and lived experiences that create openness to positive interactions with others",
+            "Create positive interactions with people",
+            "Engage effectively with individuals by applying insights about one's own perspectives and beliefs to relate to others and bridge differences"
         ]
     },
     es5: {
         milestone: [
-            "Contributes toward achieving a common goal",
-            "Adjusts to new situations by doing things differently and showing a positive mindset",
-            "Encourages others to persist in achieving goals through changing situations"
+            "Contribute toward achieving a common goal",
+            "Adjust to new situations by doing things differently and showing a positive mindset",
+            "Encourage others to persist in achieving goals through changing situations"
         ],
         capstone: [
-            "Overcomes barriers or obstacles to achieving a common goal, often by providing guidance and support to others",
-            "Responds to and anticipates change by practicing and modeling new strategies and tools to thrive in a dynamic environment",
-            "Coaches others through changing situations"
+            "Overcome barriers or obstacles to achieving a common goal, often by providing guidance and support to others",
+            "Respond to and anticipate change by practicing and modeling new strategies and tools to thrive in a dynamic environment",
+            "Coach others through changing situations"
         ]
     },
     es6: {
         milestone: [
-            "Describes what constitutes ethical behavior and makes choices accordingly",
-            "Applies organizational and time management skills to prioritize and complete assigned tasks",
-            "Takes personal accountability for actions, including mistakes",
-            "Converses with others using field-specific terminology and tools"
+            "Describe what constitutes ethical behavior and make choices accordingly",
+            "Apply organizational and time management skills to prioritize and complete assigned tasks",
+            "Take personal accountability for actions, including mistakes",
+            "Converse with others using field-specific terminology and tools"
         ],
         capstone: [
-            "Models ethical behavior and adheres to a professional code of ethics, as applicable",
-            "Shows initiative by leveraging organizational and time management skills to proactively seek professional opportunities for growth",
-            "Uses feedback from others to improve performance",
-            "Stays current with industry standards, including best practices and technological tools within the chosen profession"
+            "Model ethical behavior and adhere to a professional code of ethics, as applicable",
+            "Show initiative by leveraging organizational and time management skills to proactively seek professional opportunities for growth",
+            "Use feedback from others to improve performance",
+            "Stay current with industry standards, including best practices and technological tools within the chosen profession"
         ]
     },
     es7: {
         milestone: [
-            "Engages with others who represent different perspectives on public policy and the social good through active listening, dialogue, and collaboration",
-            "Leverages knowledge of the impact of civic participation on public policy to plan for social action",
-            "Presents persuasive arguments that benefit society based on reflection, analysis, and outside knowledge or perspectives"
+            "Engage with others who represent different perspectives on public policy and the social good through active listening, dialogue, and collaboration",
+            "Leverage knowledge of the impact of civic participation on public policy to plan for social action",
+            "Present persuasive arguments that benefit society based on reflection, analysis, and outside knowledge or perspectives"
         ],
         capstone: [
-            "Assesses fact-based dimensions of community-based problems to generate solutions reflecting multiple needs and perspectives",
-            "Collaborates to engage community stakeholders in civic action that targets appropriate levers for civic change",
-            "Tailors communications to elicit support for civic action in response to the needs, interests, and potential contributions of different audiences"
+            "Assess fact-based dimensions of community-based problems to generate solutions reflecting multiple needs and perspectives",
+            "Collaborate to engage community stakeholders in civic action that targets appropriate levers for civic change",
+            "Tailor communications to elicit support for civic action in response to the needs, interests, and potential contributions of different audiences"
         ]
     },
     es8: {
         milestone: [
-            "Contributes ideas aligned to identified objectives of the team",
-            "Addresses conflicts constructively, communicating expectations and adjusting own behavior based on feedback",
-            "Identifies tasks required to reach a goal and learns about team members' assets to support the distribution of roles and responsibilities",
-            "Adapts to changing project requirements and roles in a way that fosters mutual trust and respect"
+            "Contribute ideas aligned to identified objectives of the team",
+            "Address conflicts constructively, communicating expectations and adjusting own behavior based on feedback",
+            "Identify tasks required to reach a goal and learn about team members' assets to support the distribution of roles and responsibilities",
+            "Adapt to changing project requirements and roles in a way that fosters mutual trust and respect"
         ],
         capstone: [
-            "Advocates for evidence-based solutions that promote the team's identified objectives",
-            "Fosters strong team cohesion by giving and soliciting feedback and responding transparently",
-            "Collaborates with multiple teams, utilizing different perspectives and skills to achieve common goals",
-            "Navigates between leading and supporting through advocacy for mutual goals and integration of team members' strengths"
+            "Advocate for evidence-based solutions that promote the team's identified objectives",
+            "Foster strong team cohesion by giving and soliciting feedback and responding transparently",
+            "Collaborate with multiple teams, utilizing different perspectives and skills to achieve common goals",
+            "Navigate between leading and supporting through advocacy for mutual goals and integration of team members' strengths"
         ]
     },
     es9: {
         milestone: [
-            "Applies learned knowledge to resolve foundational problems pertinent to the desired career pathway",
-            "Explains concepts that support the practical application of knowledge, skills, and abilities related to professional interests",
-            "Reflects on personal and academic experiences to assess compatibility and provide reasoning for career choice"
+            "Apply learned knowledge to resolve foundational problems pertinent to the desired career pathway",
+            "Explain concepts that support the practical application of knowledge, skills, and abilities related to professional interests",
+            "Reflect on personal and academic experiences to assess compatibility and provide reasoning for career choice"
         ],
         capstone: [
-            "Analyzes and solves complex, real-world problems in the field using advanced knowledge, skills, and abilities",
-            "Integrates academic learning with hands-on experience to critically assess and solve complex challenges encountered in professional environments",
-            "Articulates a career development plan that builds on prior learning and experiences to define clear goals for achievement and continued learning after graduation"
+            "Analyze and solve complex, real-world problems in the field using advanced knowledge, skills, and abilities",
+            "Integrate academic learning with hands-on experience to critically assess and solve complex challenges encountered in professional environments",
+            "Articulate a career development plan that builds on prior learning and experiences to define clear goals for achievement and continued learning after graduation"
         ]
     },
     es10: {
         milestone: [
-            "Develops questions with the appropriate scope for the field",
-            "Implements search strategies to find information using credible resources relevant to the field",
-            "Analyzes strengths and weaknesses of information sources to identify elements of bias, expertise, and point of view",
-            "Identifies connections between relevant sources to make a decision"
+            "Develop questions with the appropriate scope for the field",
+            "Implement search strategies to find information using credible resources relevant to the field",
+            "Analyze strengths and weaknesses of information sources to identify elements of bias, expertise, and point of view",
+            "Identify connections between relevant sources to make a decision"
         ],
         capstone: [
-            "Articulates questions informed by key concepts, relevant terminology, and related questions in the field",
-            "Executes well-developed search strategies that consider all available resources and revises the strategy as necessary",
-            "Critiques information sources to thoroughly evaluate bias, expertise, point of view, and relevance and currency to the field",
-            "Synthesizes patterns across sources, excluding irrelevant information to draw conclusions and reach informed decisions",
-            "Attributes ethically accessed information consistently using conventions appropriate to the field"
+            "Articulate questions informed by key concepts, relevant terminology, and related questions in the field",
+            "Execute well-developed search strategies that consider all available resources and revise the strategy as necessary",
+            "Critique information sources to thoroughly evaluate bias, expertise, point of view, and relevance and currency to the field",
+            "Synthesize patterns across sources, excluding irrelevant information to draw conclusions and reach informed decisions",
+            "Attribute ethically accessed information consistently using conventions appropriate to the field"
         ]
     }
 };
@@ -979,7 +991,8 @@ const assessments = {
           details:"Portfolios are powerful for skills that develop over time. The reflective component is key — it's where students demonstrate they can not only perform the skill but understand their own development.",
           appFn:(sk,m) => {
               const ind = rubricIndicators[sk.id].capstone;
-              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The rubric expects graduates to "${ind[ind.length-1].toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
+              const reflective = ind.find(i => /reflect|articulate|development plan|insight|growth|improve|feedback/i.test(i)) || ind[1] || ind[0];
+              return `Have students compile a portfolio demonstrating their development in ${sk.context} over the course, with reflective commentary analyzing their growth. The rubric expects graduates to "${reflective.toLowerCase()}" — a reflective portfolio captures both the skill and the self-awareness.`;
           }
         },
         { title:"Culminating Experience",
@@ -1005,6 +1018,222 @@ const assessments = {
 // assessment language doesn't capture the skill authentically
 // ============================================================
 const skillSpecificApps = {
+    es1: {
+        remember: [
+            (sk,m) => "Use short assessments to verify students can identify the elements that shape a message: who the audience is, what the purpose is, and what conventions the genre expects. Interpretation items work better here than definition items, for example, giving students a short passage and asking who it was written for and how they can tell.",
+            (sk,m) => "Have students map the relationships among audience, purpose, genre, tone, and structure, showing how changing the audience forces changes in the others. This builds the awareness that written and spoken communication are choices rather than fixed formats.",
+            (sk,m) => "Ask students to describe a communication situation from their intended field, identify the audience and purpose, and explain what choices a professional would need to make. This surfaces what students already assume about communication in their discipline.",
+            (sk,m) => "Have students annotate a professional document or a recorded presentation from the discipline, marking where the communicator adapts to the audience, signals organization, and supports claims with evidence."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a realistic workplace communication scenario, such as explaining a delay to a supervisor or a technical concept to a client, and provide guiding questions or a structure students can follow as they draft the message and explain their choices."
+                : "Present a workplace communication scenario and ask students to draft the message with less scaffolding. At this stage the expectation is that students write with logical structure and sound conventions on their own, and can explain why they made the choices they did.",
+            (sk,m) => "Assign short, repeated writing tasks that hold the content constant and vary the audience. Asking students to explain the same finding to a specialist, a supervisor, and a general reader makes audience adaptation visible and practicable rather than abstract.",
+            (sk,m) => "This is where the listening side of this skill can actually be assessed. Set up structured interviews, intake conversations, or team meetings where students must give focused attention, ask clarifying questions, and respond to what was said. Debrief afterward about what they heard and what they missed.",
+            (sk,m) => "Ask students to deliver a short presentation or conduct a professional conversation, assessed with a rubric that names delivery, organization, evidence use, and audience adaptation separately, so students can see which part of the performance needs work."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two versions of the same message written for different audiences, or two professional documents addressing the same topic, and analyze how structure, word choice, evidence, and tone shift. The point is to explain why the differences exist, not just to catalog them.",
+            (sk,m) => "Give students an authentic communication artifact from the field, such as a report, a patient handout, or a press release, and ask them to analyze how it constructs its claims and adapts to its readers. Ask what a different audience would have required.",
+            (sk,m) => "Run a discussion protocol that requires students to accurately restate the previous speaker before adding their own point. This makes listening assessable rather than assumed, and it directly supports the expectation that students engage in formal conversations by offering information and ideas.",
+            (sk,m) => "Ask students to trace how a message moves through an organization or a public audience, identifying where meaning gets lost, which channels distort it, and what that implies for how a professional should communicate."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students conduct structured peer review of drafts or recorded presentations against criteria for audience fit, organization, and evidence. At this stage, students should be able to facilitate the review conversation itself, which is where active listening becomes part of the evidence rather than a separate skill."
+                : "Have students review peer drafts or professional examples against criteria you provide for audience fit, organization, and evidence. Assess the quality of the feedback they give, not just the work they reviewed.",
+            (sk,m) => "Assign a paper or presentation in which students take a position on a debatable question in the discipline and defend it for a specified audience. Evaluate both the reasoning and whether the argument is genuinely built for the audience named.",
+            (sk,m) => "Ask students to develop criteria for effective professional communication in their field. What distinguishes a document or presentation that works from one that is merely adequate? What would a reader or listener notice?",
+            (sk,m) => "Present a communication problem in an organization, such as a message that failed or an audience that was missed, and ask students to evaluate what went wrong and recommend a specific revised approach, justifying it against audience and purpose."
+        ],
+        create: [
+            (sk,m) => "Ask students to design a complete communication product for a real audience and purpose, such as a public education piece, a client-facing report, or a campaign. The audience should be specified and real enough that students must make genuine adaptation choices.",
+            (sk,m) => "Have students assemble a portfolio of their written and spoken work across the term, with commentary explaining the audience and purpose of each piece and what they would change now. The commentary is where the skill is demonstrated, not just the artifacts.",
+            (sk,m) => "Design a culminating experience that pairs a substantial professional deliverable with an oral presentation to an authentic audience, so students must carry one body of work across both written and spoken forms and adapt it for each.",
+            (sk,m) => "Ask students to produce and deliver a professional-quality presentation or publication for an audience outside the classroom, such as a conference-style talk, a public briefing, or a piece written for practitioners in the field."
+        ]
+    },
+    es2: {
+        remember: [
+            (sk,m) => "Use short assessments built around brief disciplinary scenarios rather than definitions of critical thinking. Ask students to identify what is known, what is unknown, and what is being assumed in a given problem, which is the foundation for everything this skill asks them to do later.",
+            (sk,m) => "Have students map a problem from the course content, identifying its causes, contributing factors, stakeholders, and constraints. Mapping the problem is more useful here than mapping the concept of problem solving.",
+            (sk,m) => "Ask students to describe a problem in the field and explain what they would need to know in order to address it. This surfaces assumptions early and gives you a read on whether students can locate the edges of a problem.",
+            (sk,m) => "Have students annotate a disciplinary article or case, marking the claims, the evidence offered for each, and the assumptions the author does not state. This is the habit that later supports evaluating alternative perspectives."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a problem scenario from the discipline with guiding questions that walk students through defining the problem, locating relevant information, and proposing an approach. The scaffolding should make the reasoning steps visible."
+                : "Present a problem scenario with reduced scaffolding and ask students to define the problem themselves, find relevant sources, and propose an approach. At this stage students should be identifying the aspects of a problem and seeking out different perspectives without being prompted to do so.",
+            (sk,m) => "Assign ill-structured problems that have more than one defensible solution. Require students to state their assumptions and explain why they chose their approach, since the reasoning is the evidence here, not the answer.",
+            (sk,m) => "Run a structured idea-generation session with real constraints, such as a design sprint or a rapid prototyping exercise, and then require students to test their ideas against evidence. This is where the creative half of the skill becomes assessable rather than assumed.",
+            (sk,m) => "Ask students to work a problem aloud or in writing, showing each reasoning step rather than only the conclusion. Assess whether the steps hold together, which is often where the gap between a right answer and sound thinking shows up."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two proposed solutions to a disciplinary problem, analyzing the assumptions behind each, the evidence offered, and the trade-offs involved. Ask them to explain what each approach makes possible and what it forecloses.",
+            (sk,m) => "Give students sources that genuinely conflict on the same question and ask them to analyze why the disagreement exists. Differences in method, data, framing, and interest are all worth surfacing, and this directly supports considering different perspectives on a problem.",
+            (sk,m) => "Assign positions in a structured discussion and require students to articulate the strongest version of the opposing view before arguing their own. This makes perspective-taking a demonstrated behavior rather than a stated value.",
+            (sk,m) => "Ask students to break a complex problem in the discipline into its component parts, analyze how those parts interact, and identify where intervention would have the most effect. This builds toward articulating patterns, relationships, and context."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate peer solutions or published analyses against criteria for evidence quality and soundness of reasoning. At this stage students should be able to evaluate implications and weigh competing evidence, so ask them to judge not only whether a conclusion is supported but what follows from it."
+                : "Have students evaluate peer solutions or case analyses using criteria you provide for evidence quality and reasoning. Ask them to identify the strongest and weakest parts of the argument and explain the difference.",
+            (sk,m) => "Assign a paper in which students defend a conclusion on a genuinely contested question in the discipline, requiring them to engage with the evidence that cuts against their position rather than only the evidence that supports it.",
+            (sk,m) => "Ask students to develop criteria for what counts as a well-reasoned conclusion, and separately, an original contribution, in their field. Defining the standard is a strong way to internalize it.",
+            (sk,m) => "Present a complex scenario with incomplete information and competing priorities, and ask students to weigh the options and produce a justified recommendation. This maps closely to the expectation that students synthesize significant evidence and relevant perspectives to draw informed conclusions."
+        ],
+        create: [
+            (sk,m) => "Assign a project in which students develop an original approach to an open problem in the discipline, one without a known answer. Require them to integrate more than one perspective, which is where the creative and critical halves of this skill meet.",
+            (sk,m) => "Have students compile a problem-solving portfolio that shows their iterations: early attempts, what failed, what they revised, and why. The trail of revision is the clearest evidence of creative thinking, and a finished product alone will not show it.",
+            (sk,m) => "Design a culminating experience built around a real problem with no predetermined solution, where students must define the problem, gather and weigh evidence, and propose something workable, then defend the reasoning behind it.",
+            (sk,m) => "Ask students to present their solution to an audience that can question it, and assess how they respond to challenge. Holding up under questioning is part of what it means to draw informed and innovative conclusions."
+        ]
+    },
+    es3: {
+        remember: [
+            (sk,m) => "Use short assessments that ask students to read and interpret quantitative information rather than only compute with it. Reading a rate correctly, telling a count from a percentage, and saying what a graph does and does not show are all checkable and all foundational.",
+            (sk,m) => "Have students map when each form of representation is the right one, comparing what an equation, a graph, a table, and a plain-language statement each communicate well. Choosing the representation is part of the skill, not a formatting decision.",
+            (sk,m) => "Ask students to explain in plain language what a figure or statistic from the discipline actually says, and just as importantly, what it does not say. Translating quantitative information into words reveals misunderstandings that a correct calculation can hide.",
+            (sk,m) => "Have students annotate a news article, policy brief, or report that uses statistics, marking each quantitative claim and identifying what evidence stands behind it."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Give students a realistic dataset or scenario from the discipline along with guiding questions that lead them through selecting a method, carrying it out, and stating what the result means in context."
+                : "Give students a realistic dataset or scenario and ask them to determine what analysis is needed without being told. At this stage, the expectation is that students choose among quantitative strategies and articulate the assumptions behind the one they pick.",
+            (sk,m) => "Design problems that require students to decide which computation is called for rather than perform a computation they have been handed. Include cases where the obvious approach is the wrong one.",
+            (sk,m) => "Run an estimation or modeling exercise where students set assumptions, produce a result, and then see what happens when an assumption changes. This makes the role of assumptions concrete and is difficult to fake.",
+            (sk,m) => "Ask students to present a quantitative finding using a representation they select, and to justify why that representation suits the data and the audience. Assess the interpretation and the choice, not only the accuracy."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two analyses or two visualizations of the same data and analyze which better supports the conclusion being drawn. Chart choice, scale, and framing all change what a reader takes away, and analyzing that is squarely within this skill.",
+            (sk,m) => "Give students real data from the discipline and ask them to analyze it and explain its limitations. What the data cannot tell you is as much a part of quantitative reasoning as what it can.",
+            (sk,m) => "Organize a discussion around a question where both sides cite statistics, and ask students to analyze how the same underlying numbers can support competing claims. This builds directly toward distinguishing appropriate from inappropriate uses of statistics.",
+            (sk,m) => "Ask students to examine a model used in the field, identifying its inputs, its assumptions, and which of those assumptions the results are most sensitive to."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate published analyses or peer work for appropriate use of statistics, judging whether the method fits the question and whether the conclusions exceed what the data supports. This maps directly to the expectation that students differentiate appropriate from inappropriate uses of statistics in real-world contexts."
+                : "Have students evaluate an analysis using criteria you provide, checking whether the method fits the question, whether the representation is honest, and whether the conclusion follows from the numbers.",
+            (sk,m) => "Assign a paper in which students argue a data-informed position on a contested question in the discipline, requiring them to address the limitations of their evidence rather than only its strengths.",
+            (sk,m) => "Ask students to develop criteria for what makes a quantitative claim trustworthy in their field. What would have to be true about the data, the method, and the reporting?",
+            (sk,m) => "Present a decision scenario with real data and ask students to recommend a course of action, quantify the uncertainty involved, and explain what would change their recommendation."
+        ],
+        create: [
+            (sk,m) => "Ask students to formulate their own question, locate or generate appropriate data, and build an analysis or model that answers it. Choosing the question is where original quantitative work begins.",
+            (sk,m) => "Have students compile a set of their analyses with commentary explaining the methods they chose, what the results meant in context, and what they would do differently now. The commentary carries the reasoning that the calculations alone do not show.",
+            (sk,m) => "Design a culminating data project that runs the full arc: question, data, method, conclusion, and limitations, with students working independently on a problem that matters in the field.",
+            (sk,m) => "Ask students to communicate a quantitative finding to a non-technical audience through a brief, a dashboard, or a visual presentation. Making quantitative work legible to a decision-maker is a professional expectation in most fields."
+        ]
+    },
+    es7: {
+        remember: [
+            (sk,m) => "Use short assessments to verify students can identify how decisions actually get made on an issue: who decides, at what level of government or organization, and through what process. Civic participation depends on knowing where the levers are.",
+            (sk,m) => "Have students map the stakeholders and decision points surrounding a specific local issue, showing who holds influence, who is affected, and where a citizen could plausibly intervene.",
+            (sk,m) => "Ask students to identify a community issue they care about and write about what they currently know about how it is governed and what they would need to find out. This grounds the skill in a real issue rather than in civics as a subject.",
+            (sk,m) => "Have students annotate local news coverage or a policy brief, identifying the claims made, the interests represented, and the actions being proposed."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a community problem scenario with guiding questions that help students identify the stakeholders, the decision-making body, and one plausible action step. Scaffolding matters here because most students have never traced a civic process before."
+                : "Present a community problem and ask students to identify the relevant decision-makers and propose an action step with less guidance. At this stage the expectation is that students can use what they know about civic participation to plan a course of social action.",
+            (sk,m) => "Ask students to draft a plan for addressing a local issue that names the specific decision-maker, the appropriate lever, and the evidence they would bring. Vague calls to raise awareness should not satisfy the assignment.",
+            (sk,m) => "Run a mock public hearing, council meeting, or stakeholder negotiation in which students represent assigned positions and must listen and respond to competing interests in real time. This is where engaging with different perspectives through dialogue becomes observable.",
+            (sk,m) => "Ask students to deliver a short advocacy message to a specified audience, assessed on whether the appeal is fitted to that audience's interests and concerns rather than to the student's own."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare how two communities, or the same community in two periods, responded to a similar problem, analyzing what accounted for the different outcomes.",
+            (sk,m) => "Give students local data such as census, public health, or municipal budget figures and ask them to analyze what it reveals about a community problem. Grounding civic claims in evidence is what distinguishes analysis from opinion here.",
+            (sk,m) => "Assign positions in a structured discussion of a public policy question and require students to represent the opposing interests accurately before arguing against them.",
+            (sk,m) => "Ask students to trace how a policy actually gets made and implemented in a specific domain, analyzing at which points public input carries weight and at which points it does not."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate real advocacy campaigns or civic proposals against criteria for evidence, feasibility, and whether the action targets a lever that can actually move. At this stage students should be able to judge whether a proposed solution reflects the needs and perspectives of the community it claims to serve."
+                : "Have students evaluate advocacy materials or civic proposals using criteria you provide, assessing the quality of the evidence and whether the proposed action fits the problem.",
+            (sk,m) => "Assign a paper in which students argue a public policy position grounded in evidence and engage seriously with the interests that would be harmed or opposed.",
+            (sk,m) => "Ask students to develop criteria for civic action that is both effective and ethical. What separates genuine community engagement from performance, and how would an outside observer tell?",
+            (sk,m) => "Present a community problem and ask students to assess its fact-based dimensions, weigh competing needs, and recommend an action aimed at a specific lever for change, justifying the choice of lever as well as the action."
+        ],
+        create: [
+            (sk,m) => "Ask students to design a civic action plan or advocacy campaign for a real issue and a real audience, including the message, the target, and the evidence base. The deliverable should be something that could actually be used.",
+            (sk,m) => "Have students document their civic engagement across the term and write reflective commentary on how their understanding of the issue and of their own role changed. Growth in civic judgment is the evidence, not hours logged.",
+            (sk,m) => "Design a culminating community-engaged project in which students work with actual stakeholders on a real problem, so that collaboration and the need to reconcile competing perspectives are built into the work rather than simulated.",
+            (sk,m) => "Ask students to present their proposal to an authentic audience such as a council, a community organization, or a public forum, with the communication deliberately tailored to what will move that particular audience."
+        ]
+    },
+    es9: {
+        remember: [
+            (sk,m) => "Use short assessments to verify students can name where course concepts show up in professional practice: which roles use them, for what decisions, and with what consequences when they are applied poorly.",
+            (sk,m) => "Have students map course concepts to the actual tasks and roles of the field, so the connection between what they are learning and what practitioners do becomes explicit rather than assumed.",
+            (sk,m) => "Ask students to describe a career path that interests them and identify which parts of the course connect to it. This supports the expectation that students reflect on academic experiences to reason about career choice.",
+            (sk,m) => "Have students annotate an authentic professional artifact from the field, such as a case file, a specification, a chart, or a client report, identifying the course concepts visible in it."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present an entry-level professional problem with guiding questions that help students apply what they have learned to resolve it. Keeping the problem foundational is appropriate here and matches what the rubric expects at this stage."
+                : "Present a professional problem and ask students to resolve it with less scaffolding, explaining which concepts they drew on and why. At this stage the expectation is that students apply learned knowledge to foundational problems relevant to their intended career pathway.",
+            (sk,m) => "Assign authentic tasks drawn from practice, the kind of work a new hire would actually be handed in the first months. The closer the task is to real professional work, the more directly it generates evidence for this skill.",
+            (sk,m) => "Run a workplace simulation in which students take on a professional role and work a realistic task under realistic constraints, including incomplete information and a deadline.",
+            (sk,m) => "Ask students to perform a discipline-specific professional task to the standard a practitioner would be held to, using a rubric drawn from field expectations rather than course expectations."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare how two roles or two settings in the field approach the same problem, analyzing what accounts for the difference in method, priority, or constraint.",
+            (sk,m) => "Give students real professional data or documentation and ask them to analyze it the way a practitioner would, explaining what they notice and what they would do next.",
+            (sk,m) => "Organize a discussion around a live practice question in the field, one where practitioners genuinely disagree, and require students to ground their positions in disciplinary knowledge rather than preference.",
+            (sk,m) => "Ask students to analyze a professional workflow from start to finish, identifying where academic knowledge is applied, where judgment takes over, and where gaps between training and practice appear."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students evaluate professional work products against the standards of the field, their peers' or real examples. At this stage students should be integrating academic learning with practical experience well enough to judge quality the way a practitioner would."
+                : "Have students evaluate professional work products against criteria you provide, drawn from field standards, and explain what separates adequate work from strong work.",
+            (sk,m) => "Assign a paper in which students take and defend a position on a practice question in their field, supported by both disciplinary theory and practical considerations.",
+            (sk,m) => "Ask students to develop criteria that distinguish competent practice from expert practice in their field. Articulating the difference is a strong indicator that they understand where they are on that path.",
+            (sk,m) => "Present a complex, real-world professional scenario and ask students to analyze it and recommend a course of action using advanced disciplinary knowledge, justifying the recommendation against the constraints practitioners actually face."
+        ],
+        create: [
+            (sk,m) => "Ask students to produce something a practitioner in the field would produce for a real need, such as a plan, a protocol, a design, or a proposal, held to professional rather than academic standards.",
+            (sk,m) => "Have students compile a portfolio of work samples alongside a career development plan and reflective commentary on how their learning and experience connect. This maps directly to the expectation that graduates articulate a career development plan built on prior learning.",
+            (sk,m) => "Design a culminating experience anchored in real professional work, such as an internship deliverable, a client project, or a practicum assignment, where the problem is complex enough that no single course provides the answer.",
+            (sk,m) => "Ask students to present their work to practitioners in the field and respond to their questions. An audience that knows the work is the most authentic assessment of whether the application holds up."
+        ]
+    },
+    es10: {
+        remember: [
+            (sk,m) => "Use short assessments to verify students can distinguish the kinds of sources their field relies on and explain what each is useful for. Knowing when a peer-reviewed study, a trade publication, and a government dataset are each the right tool is foundational to everything else in this skill.",
+            (sk,m) => "Have students map the information landscape of the discipline: who produces information in this field, where it is published, who reviews it, and what each type of source is good for.",
+            (sk,m) => "Ask students to describe how they currently find information for coursework and consider where that approach would fall short in professional practice. This makes existing habits visible before asking students to change them.",
+            (sk,m) => "Have students annotate a single source closely, marking the author's credentials, the purpose, the evidence offered, and the point of view, which builds the habit behind evaluating strengths and weaknesses of sources."
+        ],
+        apply: [
+            (sk,m) => m==='I'
+                ? "Present a decision scenario with guiding questions that walk students through locating sources and justifying which ones they would rely on. Making the search process explicit matters more here than the sources they land on."
+                : "Present a decision scenario and ask students to locate and justify their sources with less guidance. At this stage the expectation is that students implement search strategies using credible resources relevant to the field.",
+            (sk,m) => "Ask students to turn a vague topic into a question with appropriate scope for the field, then carry out and document a search against it. Scoping the question is the step most students skip and the one the rubric names first.",
+            (sk,m) => "Run a time-boxed search challenge in which students find the best available evidence on a question and defend their choice. Working under constraint surfaces search habits that an untimed assignment will not.",
+            (sk,m) => "Ask students to submit a documented search strategy along with their results, including the terms they used, what they revised, and why. The strategy is the demonstrable skill; the sources are the byproduct."
+        ],
+        analyze: [
+            (sk,m) => "Have students compare two sources addressing the same question and analyze them for credibility, expertise, point of view, and currency. Ask what each source is positioned to see and what it is positioned to miss.",
+            (sk,m) => "Give students a set of sources on one question and ask them to analyze what each contributes, where they overlap, and what perspective is missing from the set entirely.",
+            (sk,m) => "Organize a discussion in which students must disclose and defend the sources behind their claims. Requiring the evidence to be named changes the quality of the conversation considerably.",
+            (sk,m) => "Ask students to analyze how information on a topic is produced and circulated in their field: who funds it, who publishes it, what gets amplified, and what that means for a reader trying to make a decision."
+        ],
+        evaluate: [
+            (sk,m) => m==='M'
+                ? "Have students critique peer or published source selection and attribution, judging relevance and currency alongside credibility. At this stage the expectation is that students critique sources thoroughly and attribute ethically using the conventions of the field, so assess both the judgment and the citation practice."
+                : "Have students evaluate a set of sources using criteria you provide for bias, expertise, and point of view, and explain which sources they would rely on for a decision and why.",
+            (sk,m) => "Assign a paper in which students take a position supported by a synthesized evidence base, and require them to explain which sources they excluded and on what grounds. Deliberate exclusion is part of the skill.",
+            (sk,m) => "Ask students to develop criteria for what makes a source credible in their specific field, since the standards that hold in one discipline do not automatically transfer to another.",
+            (sk,m) => "Present a decision scenario and ask students to synthesize across multiple sources to recommend a course of action, drawing connections among sources rather than summarizing them one at a time."
+        ],
+        create: [
+            (sk,m) => "Ask students to produce a synthesis product for a real need, such as an evidence brief, a literature review, or an annotated resource guide, where the value lies in what the synthesis reveals across sources rather than in any single source.",
+            (sk,m) => "Have students keep and submit a research log showing how their question and search strategy evolved, with commentary on what prompted each revision. The revisions are the evidence that the strategy was well developed rather than lucky.",
+            (sk,m) => "Design a culminating research project with full documentation of the search process, the reasoning behind source selection, and consistent ethical attribution in the conventions of the field.",
+            (sk,m) => "Ask students to present a synthesized evidence brief to an audience that has to make a decision with it, which forces them to distinguish what matters from what is merely available."
+        ]
+    },
     es4: {
         remember: [
             (sk,m) => "Use short assessments to verify students can identify key concepts related to effective interpersonal interaction — such as recognizing how personal perspectives shape communication, distinguishing between productive and unproductive interaction patterns, or explaining why self-awareness matters in collaborative settings.",
@@ -1158,6 +1387,36 @@ const skillSpecificApps = {
 // Keyed by skill → bloom level → index position in the generic array.
 // ============================================================
 const skillReplacements = {
+    es1: {
+        analyze: {
+            0: { title:"Audience and Purpose Analysis", desc:"Students examine how a message changes when its audience or purpose changes, and explain the reasoning behind each shift.", details:"Give students two versions of the same message written for different readers, or two professional documents on the same topic. The task is to explain why the differences exist, not to catalog them. This keeps the analysis on communication choices rather than on subject matter.",
+                appFn:(sk,m) => "Have students compare two versions of the same message written for different audiences, or two professional documents addressing the same topic, and analyze how structure, word choice, evidence, and tone shift. The point is to explain why the differences exist, not just to identify them." },
+            2: { title:"Listening-Based Discussion Protocol", desc:"Students take part in a structured discussion that requires them to accurately restate the previous speaker before adding their own contribution.", details:"This makes listening observable and assessable rather than assumed. Assess whether the restatement was accurate and whether the student's contribution actually responded to it, which is difficult to fake and rarely captured by ordinary discussion grading.",
+                appFn:(sk,m) => "Run a discussion protocol that requires students to accurately restate the previous speaker before adding their own point. This makes listening assessable rather than assumed, and it supports the expectation that students engage in formal conversations by offering information and ideas." }
+        }
+    },
+    es7: {
+        apply: {
+            1: { title:"Civic Action Planning", desc:"Students develop a concrete plan for addressing a local issue, naming the decision-maker, the lever, and the evidence.", details:"The value of this task is in its specificity. A plan that names a particular body, a particular decision point, and a particular piece of evidence is doing the work; a plan that calls for raising awareness generally is not. Assess the precision of the targeting.",
+                appFn:(sk,m) => "Ask students to draft a plan for addressing a local issue that names the specific decision-maker, the appropriate lever, and the evidence they would bring. Vague calls to raise awareness should not satisfy the assignment." }
+        }
+    },
+    es9: {
+        apply: {
+            1: { title:"Authentic Professional Task", desc:"Students complete a task drawn directly from practice in the field, held to professional rather than academic standards.", details:"The closer the task is to work a new practitioner would actually be assigned, the more directly it produces evidence for this skill. Use real templates, real formats, and real constraints wherever possible, and assess against field expectations.",
+                appFn:(sk,m) => "Assign authentic tasks drawn from practice, the kind of work a new hire would actually be handed in the first months. The closer the task is to real professional work, the more directly it generates evidence for this skill." }
+        }
+    },
+    es10: {
+        apply: {
+            1: { title:"Question Scoping and Search Strategy", desc:"Students turn a broad topic into a question with appropriate scope for the field, then carry out and document a search against it.", details:"Scoping the question is the step most students skip, and it is the one the rubric names first. Require students to submit the search terms they used, what they revised mid-search, and why, so the strategy itself is visible rather than only its results.",
+                appFn:(sk,m) => "Ask students to turn a vague topic into a question with appropriate scope for the field, then carry out and document a search against it. Scoping the question is the step most students skip and the one the rubric names first." }
+        },
+        create: {
+            0: { title:"Evidence Synthesis Product", desc:"Students produce a brief, review, or resource guide whose value comes from what emerges across sources rather than from any single source.", details:"Synthesis is the distinguishing move at this level: patterns across sources, not summaries of them one at a time. Require students to state what the body of evidence supports, where it conflicts, and what it does not yet answer.",
+                appFn:(sk,m) => "Ask students to produce a synthesis product for a real need, such as an evidence brief, a literature review, or an annotated resource guide, where the value lies in what the synthesis reveals across sources rather than in any single source." }
+        }
+    },
     es4: {
         apply: {
             1: { title:"Active Listening and Perspective-Taking Practice", desc:"Students practice listening to understand — not just to respond — and demonstrate they can accurately represent another person's viewpoint.", details:"Pair students for a structured exercise where they must listen to their partner's perspective, paraphrase it, and confirm accuracy before sharing their own. Assess the quality of listening and representation, not who 'wins' the exchange.",
@@ -1258,11 +1517,18 @@ function getWatchout(mastery, blooms) {
 // ============================================================
 // STATE & NAVIGATION
 // ============================================================
-const state = { screen:'welcome', skill:null, secondarySkill:null, mastery:null, blooms:null };
+const state = { screen:'welcome', skill:null, secondarySkill:null, secondaryMastery:null, mastery:null, blooms:null };
 
 function goToScreen(id) {
     if (id === 'mastery-screen' && state.skill) {
         document.getElementById('mastery-skill-name').textContent = skills.find(s=>s.id===state.skill).name;
+        const wrap = document.getElementById('secondary-level-wrap');
+        if (state.secondarySkill) {
+            document.getElementById('secondary-skill-name').textContent = skills.find(s=>s.id===state.secondarySkill).name;
+            wrap.style.display = 'block';
+        } else {
+            wrap.style.display = 'none';
+        }
     }
     if (id === 'blooms-screen' && state.skill && state.mastery) {
         document.getElementById('blooms-skill-name').textContent = skills.find(s=>s.id===state.skill).name;
@@ -1323,6 +1589,20 @@ function renderSecondarySkillOptions() {
 
 function setSecondarySkill(value) {
     state.secondarySkill = value || null;
+    if (!state.secondarySkill) {
+        state.secondaryMastery = null;
+        const lv = document.getElementById('secondary-level');
+        if (lv) lv.value = 'same';
+    }
+}
+
+function setSecondaryMastery(value) {
+    state.secondaryMastery = (value && value !== 'same') ? value : null;
+}
+
+// Level the secondary skill is assessed at — its own if set, otherwise the primary's
+function secondaryLevel() {
+    return state.secondaryMastery || state.mastery;
 }
 
 function selectSkill(id) {
@@ -1395,15 +1675,19 @@ function renderCbinContext() {
     let secondaryLine = '';
     if (state.secondarySkill) {
         const sec = skills.find(s=>s.id===state.secondarySkill);
-        const secIndicators = rubricIndicators[sec.id][rl];
+        const secM = secondaryLevel();
+        const secIndicators = rubricIndicators[sec.id][getRubricLevel(secM)];
+        const secBadge = cbinFraming[secM].badge;
         secondaryLine = `
-            <p style="margin-top:14px;"><span class="cbin-indicator-lead">Because this course also addresses ES${sec.num}: ${sec.name}, these indicators apply as well:</span></p>
-            <ul>${secIndicators.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+            <p style="margin-top:16px;"><span class="cbin-indicator-lead">This course also addresses ES${sec.num}: ${sec.name} at the ${masteryInfo[secM].label.toLowerCase()} level (${secBadge}). These indicators apply as well:</span></p>
+            <ul>${secIndicators.map(i=>`<li>${i}</li>`).join('')}</ul>
+            <p style="margin-top:8px;font-size:12.5px;color:var(--text-light);">The suggestions below are built around your primary skill. Use these indicators to check whether the assignment you design would also generate evidence for this one.</p>`;
     }
 
     el.innerHTML = `
         <div class="cbin-level-badge">CPE Performance Level: ${f.badge}</div>
         <h4>Where Your Course Falls in the KGP Progression</h4>
+        <p><span class="cbin-indicator-lead">This course addresses ES${skill.num}: ${skill.name} at the ${masteryInfo[state.mastery].label.toLowerCase()} level (${f.badge}).</span></p>
         <p>${f.lead}</p>
         <p style="margin-top:14px;"><span class="cbin-indicator-lead">${f.indicatorLead}</span></p>
         <ul>${indicators.map(i => `<li>${i}</li>`).join('')}</ul>
@@ -1428,7 +1712,7 @@ function showResults() {
     const secRow = document.getElementById('result-secondary-row');
     if (state.secondarySkill) {
         const sec = skills.find(s=>s.id===state.secondarySkill);
-        document.getElementById('result-secondary').textContent = `ES${sec.num}: ${sec.name}`;
+        document.getElementById('result-secondary').textContent = `ES${sec.num}: ${sec.name} (${masteryInfo[secondaryLevel()].full})`;
         secRow.style.display = 'flex';
     } else {
         secRow.style.display = 'none';
@@ -1486,13 +1770,17 @@ function showResults() {
 // RESTART
 // ============================================================
 function restartTool() {
-    state.skill=null; state.secondarySkill=null; state.mastery=null; state.blooms=null;
+    state.skill=null; state.secondarySkill=null; state.secondaryMastery=null; state.mastery=null; state.blooms=null;
     document.querySelectorAll('.skill-card,.mastery-card,.blooms-card').forEach(c=>c.classList.remove('selected'));
     document.getElementById('skill-next').disabled=true;
     document.getElementById('mastery-next').disabled=true;
     document.getElementById('blooms-next').disabled=true;
     const secSel = document.getElementById('secondary-skill');
     if (secSel) secSel.value = '';
+    const secLv = document.getElementById('secondary-level');
+    if (secLv) secLv.value = 'same';
+    const secLvWrap = document.getElementById('secondary-level-wrap');
+    if (secLvWrap) secLvWrap.style.display = 'none';
     document.getElementById('secondary-skill-box').style.display = 'none';
     document.getElementById('result-secondary-row').style.display = 'none';
     goToScreen('welcome-screen');
